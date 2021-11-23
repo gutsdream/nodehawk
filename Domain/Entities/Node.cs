@@ -1,15 +1,85 @@
 using System;
+using System.Collections.Generic;
+using Domain.ExceptionHandling;
 
 namespace Domain.Entities
 {
     public class Node
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; protected set; }
+        public Guid ConnectionDetailsId { get; protected set; }
+
         public string Title { get; set; }
-        
+
         /// <summary>
-        /// The Node's identifier (allows for connection to OT Hub)
+        /// The Node's identifier (allows for connection to OT Hub) - optional
         /// </summary>
         public string ExternalId { get; set; }
+
+        public virtual ConnectionDetails ConnectionDetails { get; protected set; }
+        public virtual ICollection<Snapshot> Snapshots { get; protected set; }
+
+        public Node( )
+        {
+        }
+
+        public Node( string title, ConnectionDetails connectionDetails, string externalId = null )
+        {
+            SetTitle( title );
+            SetConnectionDetails( connectionDetails );
+            ExternalId = externalId;
+        }
+
+        public void SetTitle( string title )
+        {
+            Throw.IfNull( title, nameof( title ) );
+            Title = title;
+        }
+
+        public void SetConnectionDetails( ConnectionDetails connectionDetails )
+        {
+            Throw.IfNull( connectionDetails, nameof( connectionDetails ) );
+            ConnectionDetails = connectionDetails;
+        }
+
+        public Snapshot CreateSnapshot( int spaceUsedPercentage )
+        {
+            var snapshot = new Snapshot( this, spaceUsedPercentage );
+            Snapshots.Add( snapshot );
+
+            return snapshot;
+        }
+
+        public class Snapshot
+        {
+            public Guid Id { get; protected set; }
+            public Guid NodeId { get; protected set; }
+
+            public int SpaceUsedPercentage { get; protected set; }
+            public DateTime CreatedDateUtc { get; protected set; }
+
+            public virtual Node Node { get; protected set; }
+            
+            public int SpaceAvailablePercentage => 100 - SpaceUsedPercentage;
+
+            protected Snapshot( )
+            {
+                CreatedDateUtc = DateTime.UtcNow;
+            }
+
+            protected internal Snapshot( Node node, int spaceUsedPercentage )
+            {
+                Throw.IfNull( node, nameof( node ) );
+                Node = node;
+
+                SetSpaceUsed( spaceUsedPercentage );
+            }
+
+            public void SetSpaceUsed( int spaceUsed )
+            {
+                Throw.IfNot.Percentage( spaceUsed, nameof( spaceUsed ) );
+                SpaceUsedPercentage = spaceUsed;
+            }
+        }
     }
 }

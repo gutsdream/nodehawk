@@ -1,3 +1,7 @@
+using Application.Interfaces;
+using Application.Nodes;
+using Application.Nodes.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +41,10 @@ namespace Api
                     .AllowAnyHeader( )
                     .WithOrigins( "http://localhost:3000" );
             } ) );
+
+            services.AddScoped<IRepository, Repository>( );
+
+            services.AddMediatR( typeof( NodeListQueryHandler ).Assembly );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

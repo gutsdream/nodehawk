@@ -1,34 +1,28 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Application.Nodes;
+using Application.Nodes.Queries;
 using Domain.Entities;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Api.Controllers
 {
     public class NodesController : ApiBaseController
     {
-        private readonly DataContext _context;
-
-        public NodesController( DataContext context )
-        {
-            _context = context;
-        }
-
+        public NodesController( IMediator mediator ) : base( mediator ) { }
+        
         [HttpGet]
         public async Task<ActionResult<List<Node>>> GetNodes( )
         {
-            return await _context.Nodes.ToListAsync( );
+            return await Mediator.Send( new NodeList.Query( ) );
         }
 
-        [HttpGet("{id}")]
-
-    public async Task<ActionResult<Node>> GetNode( Guid id )
+        [HttpGet( "{id:guid}" )]
+        public async Task<ActionResult<Node>> GetNode( Guid id )
         {
-            return await _context.Nodes.FindAsync( id );
+            return await Mediator.Send( new NodeDetails.Query( id ) );
         }
     }
 }
