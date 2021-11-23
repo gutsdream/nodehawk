@@ -11,6 +11,8 @@ namespace Api
 {
     public class Startup
     {
+        private const string CorsPolicyName = "CorsPolicy";
+
         public Startup( IConfiguration configuration )
         {
             Configuration = configuration;
@@ -22,15 +24,19 @@ namespace Api
         public void ConfigureServices( IServiceCollection services )
         {
             services.AddControllers( );
-            services.AddSwaggerGen( c =>
-            {
-                c.SwaggerDoc( "v1", new OpenApiInfo { Title = "Api", Version = "v1" } );
-            } );
+            services.AddSwaggerGen( c => { c.SwaggerDoc( "v1", new OpenApiInfo { Title = "Api", Version = "v1" } ); } );
 
             services.AddDbContext<DataContext>( opt =>
             {
                 opt.UseSqlite( Configuration.GetConnectionString( "DefaultConnection" ) );
-            });
+            } );
+
+            services.AddCors( x => x.AddPolicy( CorsPolicyName, policy =>
+            {
+                policy.AllowAnyMethod( )
+                    .AllowAnyHeader( )
+                    .WithOrigins( "http://localhost:3000" );
+            } ) );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,6 +52,8 @@ namespace Api
             // app.UseHttpsRedirection( );
 
             app.UseRouting( );
+
+            app.UseCors( CorsPolicyName );
 
             app.UseAuthorization( );
 
