@@ -24,7 +24,7 @@ namespace Api.Controllers
         [HttpGet( "{id:guid}" )]
         public async Task<ActionResult<NodeDto>> GetNode( Guid id )
         {
-            return Evaluate( await Mediator.Send( new NodeDetails.Query( id ) ));
+            return Evaluate( await Mediator.Send( new NodeDetails.Query( id ) ) );
         }
 
         [HttpPost]
@@ -32,7 +32,7 @@ namespace Api.Controllers
         {
             return Evaluate( await Mediator.Send( createNodeCommand ) );
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> UpdateNode( UpdateNode.Command updateNodeCommand )
         {

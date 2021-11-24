@@ -9,15 +9,15 @@ namespace Api.Controllers
     [Route( "api/[controller]/[action]" )]
     public abstract class ApiBaseController : ControllerBase
     {
-        public IMediator Mediator { get; }
+        protected IMediator Mediator { get; }
 
-        public ApiBaseController( IMediator mediator )
+        protected ApiBaseController( IMediator mediator )
         {
             Mediator = mediator;
         }
 
         [ApiExplorerSettings( IgnoreApi = true )]
-        public ActionResult Evaluate( ICommandResult result )
+        protected ActionResult Evaluate( ICommandResult result )
         {
             return result.IsSuccessful
                 ? Ok( result )
@@ -25,7 +25,7 @@ namespace Api.Controllers
         }
 
         [ApiExplorerSettings( IgnoreApi = true )]
-        public ActionResult<TContent> Evaluate<TContent>( IQueryResult<TContent> result )
+        protected ActionResult<TContent> Evaluate<TContent>( IQueryResult<TContent> result )
         {
             return result.State == Status.NotFound
                 ? NotFound( result.Content )

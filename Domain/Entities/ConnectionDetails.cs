@@ -20,9 +20,9 @@ namespace Domain.Entities
         // TODO: encryption
         public ConnectionDetails( string host, string username, string key )
         {
-            Throw.IfNull( host, nameof( host ) );
-            Throw.IfNull( username, nameof( username ) );
-            Throw.IfNull( key, nameof( key ) );
+            Throw.If.Null( host, nameof( host ) );
+            Throw.If.Null( username, nameof( username ) );
+            Throw.If.Null( key, nameof( key ) );
 
             Host = host;
             Username = username;

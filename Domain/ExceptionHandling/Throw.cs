@@ -4,19 +4,22 @@ namespace Domain.ExceptionHandling
 {
     public static class Throw
     {
-        public static void IfNull( dynamic nullable, string name )
+        public static class If
         {
-            if ( nullable == null )
+            public static void Null( dynamic nullable, string name )
             {
-                throw new ArgumentNullException( $"{name} must not be null." );
+                if ( nullable == null )
+                {
+                    throw new ArgumentNullException( $"{name} must not be null." );
+                }
             }
-        }
-        
-        public static void IfInvalidLength( string value, string name, int length )
-        {
-            if ( value.Length != length )
+
+            public static void InvalidLength( string value, string name, int length )
             {
-                throw new ArgumentNullException( $"{name} must have length of {length}." );
+                if ( value.Length != length )
+                {
+                    throw new ArgumentException( $"{name} must have length of {length}." );
+                }
             }
         }
 
@@ -24,9 +27,9 @@ namespace Domain.ExceptionHandling
         {
             public static void Percentage( int percentage, string name )
             {
-                if ( percentage < 0 || percentage > 100 )
+                if ( percentage is < 0 or > 100 )
                 {
-                    throw new ArgumentException( $"{nameof( name )}Must be between 0-100 to represent a valid percentage" );
+                    throw new ArgumentException( $"{name} must be between 0-100 to represent a valid percentage" );
                 }
             }
         }

@@ -33,13 +33,13 @@ namespace Domain.Entities
 
         public void SetTitle( string title )
         {
-            Throw.IfNull( title, nameof( title ) );
+            Throw.If.Null( title, nameof( title ) );
             Title = title;
         }
 
         public void SetConnectionDetails( ConnectionDetails connectionDetails )
         {
-            Throw.IfNull( connectionDetails, nameof( connectionDetails ) );
+            Throw.If.Null( connectionDetails, nameof( connectionDetails ) );
             ConnectionDetails = connectionDetails;
         }
 
@@ -50,7 +50,7 @@ namespace Domain.Entities
                 return;
             }
 
-            Throw.IfInvalidLength( externalId, nameof( externalId ), NodeConstants.ExternalIdLength );
+            Throw.If.InvalidLength( externalId, nameof( externalId ), NodeConstants.ExternalIdLength );
             ExternalId = externalId;
         }
 
@@ -68,11 +68,11 @@ namespace Domain.Entities
             public Guid NodeId { get; protected set; }
 
             public int SpaceUsedPercentage { get; protected set; }
+            public int SpaceAvailablePercentage => 100 - SpaceUsedPercentage;
+
             public DateTime CreatedDateUtc { get; protected set; }
 
             public virtual Node Node { get; protected set; }
-
-            public int SpaceAvailablePercentage => 100 - SpaceUsedPercentage;
 
             protected Snapshot( )
             {
@@ -81,7 +81,7 @@ namespace Domain.Entities
 
             protected internal Snapshot( Node node, int spaceUsedPercentage )
             {
-                Throw.IfNull( node, nameof( node ) );
+                Throw.If.Null( node, nameof( node ) );
                 Node = node;
 
                 SetSpaceUsed( spaceUsedPercentage );
@@ -89,6 +89,7 @@ namespace Domain.Entities
 
             public void SetSpaceUsed( int spaceUsed )
             {
+                Throw.If.Null( spaceUsed, nameof( spaceUsed ) );
                 Throw.IfNot.Percentage( spaceUsed, nameof( spaceUsed ) );
                 SpaceUsedPercentage = spaceUsed;
             }

@@ -27,7 +27,7 @@ namespace Application
         /// <summary>
         /// Optional validation to be done before any actions are carried out. 
         /// </summary>
-        public void Validate( Func<TCommand, Task<ValidationResult>> validationFunc )
+        protected void Validate( Func<TCommand, Task<ValidationResult>> validationFunc )
         {
             _validation = validationFunc;
         }
@@ -35,7 +35,7 @@ namespace Application
         /// <summary>
         /// Action to be done upon successful validation.
         /// </summary>
-        public void OnSuccess( Func<TCommand, Task> onSuccessFunc )
+        protected void OnSuccess( Func<TCommand, Task> onSuccessFunc )
         {
             _onSuccess = onSuccessFunc;
         }
@@ -80,7 +80,7 @@ namespace Application
                 }
             }
 
-            Throw.IfNull( _onSuccess, nameof( _onSuccess ) );
+            Throw.If.Null( _onSuccess, nameof( _onSuccess ) );
 
             await _onSuccess.Invoke( request );
 
