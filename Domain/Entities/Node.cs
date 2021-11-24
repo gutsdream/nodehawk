@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Domain.Constants;
 using Domain.ExceptionHandling;
 
 namespace Domain.Entities
@@ -19,7 +20,7 @@ namespace Domain.Entities
         public virtual ConnectionDetails ConnectionDetails { get; protected set; }
         public virtual ICollection<Snapshot> Snapshots { get; protected set; }
 
-        public Node( )
+        protected Node( )
         {
         }
 
@@ -27,7 +28,7 @@ namespace Domain.Entities
         {
             SetTitle( title );
             SetConnectionDetails( connectionDetails );
-            ExternalId = externalId;
+            SetExternalId( externalId );
         }
 
         public void SetTitle( string title )
@@ -40,6 +41,17 @@ namespace Domain.Entities
         {
             Throw.IfNull( connectionDetails, nameof( connectionDetails ) );
             ConnectionDetails = connectionDetails;
+        }
+
+        public void SetExternalId( string externalId )
+        {
+            if ( externalId == null )
+            {
+                return;
+            }
+
+            Throw.IfInvalidLength( externalId, nameof( externalId ), NodeConstants.ExternalIdLength );
+            ExternalId = externalId;
         }
 
         public Snapshot CreateSnapshot( int spaceUsedPercentage )
@@ -59,7 +71,7 @@ namespace Domain.Entities
             public DateTime CreatedDateUtc { get; protected set; }
 
             public virtual Node Node { get; protected set; }
-            
+
             public int SpaceAvailablePercentage => 100 - SpaceUsedPercentage;
 
             protected Snapshot( )

@@ -24,32 +24,60 @@ namespace Persistence
             await SetFor<TEntity>( ).AddAsync( entity );
         }
 
-        public async Task<List<TEntity>> GetAll<TEntity>( Expression<Func<TEntity, bool>> predicate = null )
-            where TEntity : class
+        public IEvaluatable<TEntity> Get<TEntity>( ) where TEntity : class
         {
-            return await SetFor<TEntity>( )
-                .WhereIf( predicate != null, predicate )
-                .ToListAsync( );
+            return new Evaluatable<TEntity>( SetFor<TEntity>( ) );
         }
 
-        public async Task<TEntity> GetFirstOrDefault<TEntity>( Expression<Func<TEntity, bool>> predicate = null )
-            where TEntity : class
+        public async Task Save( )
         {
-            return await SetFor<TEntity>( )
-                .WhereIf( predicate != null, predicate )
-                .FirstOrDefaultAsync( );
+            await _context.SaveChangesAsync( );
         }
     }
 
-    internal static class QueryableExtensions
+    public class Evaluatable<TEntity> : IEvaluatable<TEntity> where TEntity : class
     {
-        public static IQueryable<TEntity> WhereIf<TEntity>( this IQueryable<TEntity> query,
-            bool condition,
-            Expression<Func<TEntity, bool>> predicate )
+        private readonly IQueryable<TEntity> _queryable;
+
+        public Evaluatable( IQueryable<TEntity> queryable )
         {
-            return condition
-                ? query.Where( predicate )
-                : query;
+            _queryable = queryable;
+        }
+
+        public IEvaluatable<TEntity> Where( Expression<Func<TEntity, bool>> predicate )
+        {
+            return new Evaluatable<TEntity>( _queryable.Where( predicate ) );
+        }
+
+        public IEvaluatable<TEntity> Include<TProperty>( Expression<Func<TEntity, TProperty>> include )
+        {
+            return new Evaluatable<TEntity>( _queryable.Include( include ) );
+        }
+
+        public async Task<bool> AnyAsync( Expression<Func<TEntity, bool>> predicate = null )
+        {
+            return predicate != null
+                ? await _queryable.AnyAsync( predicate )
+                : await _queryable.AnyAsync( );
+        }
+
+        public async Task<TEntity> FirstAsync( Expression<Func<TEntity, bool>> predicate = null )
+        {
+            return predicate != null
+                ? await _queryable.FirstAsync( predicate )
+                : await _queryable.FirstAsync( );
+        }
+
+        public async Task<TEntity> FirstOrDefaultAsync( Expression<Func<TEntity, bool>> predicate = null )
+        {
+            return predicate != null
+                ? await _queryable.FirstOrDefaultAsync( predicate )
+                : await _queryable.FirstOrDefaultAsync( );
+        }
+
+        public async Task<List<TEntity>> ToListAsync( )
+        {
+            return await _queryable.ToListAsync( );
         }
     }
 }

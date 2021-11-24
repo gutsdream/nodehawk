@@ -9,12 +9,14 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="FluentValidation" Version="10.3.4" />
       <PackageReference Include="MediatR" Version="9.0.0" />
       <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Nodes\Commands" />
+      <Folder Include="CommandHandling" />
+      <Folder Include="QueryHandling" />
     </ItemGroup>
 
 </Project>

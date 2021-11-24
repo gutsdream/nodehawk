@@ -11,6 +11,14 @@ namespace Domain.ExceptionHandling
                 throw new ArgumentNullException( $"{name} must not be null." );
             }
         }
+        
+        public static void IfInvalidLength( string value, string name, int length )
+        {
+            if ( value.Length != length )
+            {
+                throw new ArgumentNullException( $"{name} must have length of {length}." );
+            }
+        }
 
         public static class IfNot
         {

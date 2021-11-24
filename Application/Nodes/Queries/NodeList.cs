@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Interfaces;
+using Application.Models.Dtos;
 using Domain.Entities;
 using MediatR;
 
@@ -9,10 +11,12 @@ namespace Application.Nodes.Queries
 {
     public class NodeList
     {
-        public class Query : IRequest<List<Node>> { }
+        public class Query : IRequest<IQueryResult<List<NodeDto>>>
+        {
+        }
     }
 
-    public class NodeListQueryHandler : IRequestHandler<NodeList.Query, List<Node>>
+    public class NodeListQueryHandler : IRequestHandler<NodeList.Query, IQueryResult<List<NodeDto>>>
     {
         private readonly IRepository _repository;
 
@@ -20,9 +24,16 @@ namespace Application.Nodes.Queries
         {
             _repository = repository;
         }
-        public async Task<List<Node>> Handle( NodeList.Query request, CancellationToken cancellationToken )
+
+        public async Task<IQueryResult<List<NodeDto>>> Handle( NodeList.Query request, CancellationToken cancellationToken )
         {
-            return await _repository.GetAll<Node>( );
+            var nodes = await _repository.Get<Node>( )
+                .Include( x => x.ConnectionDetails )
+                .ToListAsync( );
+
+            return QueryResult<List<NodeDto>>.Found( nodes
+                .Select( x => new NodeDto( x ) )
+                .ToList( ) );
         }
     }
 }

@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Application.Nodes;
+using Application.Models.Dtos;
+using Application.Nodes.Commands;
 using Application.Nodes.Queries;
 using Domain.Entities;
 using MediatR;
@@ -11,18 +12,26 @@ namespace Api.Controllers
 {
     public class NodesController : ApiBaseController
     {
-        public NodesController( IMediator mediator ) : base( mediator ) { }
-        
-        [HttpGet]
-        public async Task<ActionResult<List<Node>>> GetNodes( )
+        public NodesController( IMediator mediator ) : base( mediator )
         {
-            return await Mediator.Send( new NodeList.Query( ) );
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<NodeDto>>> GetNodes( )
+        {
+            return Evaluate( await Mediator.Send( new NodeList.Query( ) ) );
         }
 
         [HttpGet( "{id:guid}" )]
-        public async Task<ActionResult<Node>> GetNode( Guid id )
+        public async Task<ActionResult<NodeDto>> GetNode( Guid id )
         {
-            return await Mediator.Send( new NodeDetails.Query( id ) );
+            return Evaluate( await Mediator.Send( new NodeDetails.Query( id ) ));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateNode( CreateNode.Request createNodeRequest )
+        {
+            return Evaluate( await Mediator.Send( createNodeRequest ) );
         }
     }
 }

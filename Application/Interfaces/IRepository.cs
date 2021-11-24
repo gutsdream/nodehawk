@@ -8,7 +8,23 @@ namespace Application.Interfaces
     public interface IRepository
     {
         Task Add<TEntity>( TEntity entity ) where TEntity : class;
-        Task<List<TEntity>> GetAll<TEntity>( Expression<Func<TEntity, bool>> predicate = null ) where TEntity : class;
-        Task<TEntity> GetFirstOrDefault<TEntity>( Expression<Func<TEntity, bool>> predicate = null ) where TEntity : class;
+        IEvaluatable<TEntity> Get<TEntity>( ) where TEntity : class;
+        Task Save( );
+    }
+
+    /// <summary>
+    /// Obvious IQueryable abstraction is obvious
+    /// </summary>
+    public interface IEvaluatable<TEntity> where TEntity : class
+    {
+        IEvaluatable<TEntity> Where( Expression<Func<TEntity, bool>> predicate );
+        IEvaluatable<TEntity> Include<TProperty>( Expression<Func<TEntity, TProperty>> include );
+        
+        Task<bool> AnyAsync( Expression<Func<TEntity, bool>> predicate = null );
+
+        Task<TEntity> FirstAsync( Expression<Func<TEntity, bool>> predicate = null );
+        Task<TEntity> FirstOrDefaultAsync( Expression<Func<TEntity, bool>> predicate = null );
+
+        Task<List<TEntity>> ToListAsync( );
     }
 }

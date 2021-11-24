@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Interfaces;
+using Application.Models.Dtos;
 using Domain.Entities;
 using MediatR;
 
@@ -9,7 +10,7 @@ namespace Application.Nodes.Queries
 {
     public class NodeDetails
     {
-        public class Query : IRequest<Node>
+        public class Query : IRequest<IQueryResult<NodeDto>>
         {
             public Guid Id { get; }
 
@@ -20,7 +21,7 @@ namespace Application.Nodes.Queries
         }
     }
 
-    public class NodeDetailsHandler : IRequestHandler<NodeDetails.Query, Node>
+    public class NodeDetailsHandler : IRequestHandler<NodeDetails.Query, IQueryResult<NodeDto>>
     {
         private readonly IRepository _repository;
 
@@ -29,9 +30,15 @@ namespace Application.Nodes.Queries
             _repository = repository;
         }
 
-        public async Task<Node> Handle( NodeDetails.Query request, CancellationToken cancellationToken )
+        public async Task<IQueryResult<NodeDto>> Handle( NodeDetails.Query request, CancellationToken cancellationToken )
         {
-            return await _repository.GetFirstOrDefault<Node>( node => node.Id == request.Id );
+            var node = await _repository.Get<Node>( )
+                .Include( x => x.ConnectionDetails )
+                .FirstOrDefaultAsync( x => x.Id == request.Id );
+
+            return node != null
+                ? QueryResult<NodeDto>.Found( new NodeDto( node ) )
+                : QueryResult<NodeDto>.NotFound( );
         }
     }
 }

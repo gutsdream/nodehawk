@@ -13,10 +13,11 @@ namespace Domain.Entities
 
         public virtual Node Node { get; protected set; }
 
-        public ConnectionDetails( )
+        protected ConnectionDetails( )
         {
         }
 
+        // TODO: encryption
         public ConnectionDetails( string host, string username, string key )
         {
             Throw.IfNull( host, nameof( host ) );
