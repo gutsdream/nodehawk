@@ -1,8 +1,12 @@
-using Application.Nodes.Commands.Interfaces;
+using Application.CommandHandling.Nodes.Interfaces;
 using FluentValidation;
 
 namespace Application.Validators.Nodes
 {
+    /// <summary>
+    /// Shared validator to be used on Node creation/edit commands
+    /// </summary>
+    /// <typeparam name="TAction"></typeparam>
     public class MutateNodeValidator<TAction> : AbstractValidator<TAction> where TAction : IMutateNode
     {
         public MutateNodeValidator( )

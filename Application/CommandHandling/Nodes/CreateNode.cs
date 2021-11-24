@@ -1,17 +1,16 @@
+using Application.CommandHandling.Nodes.Interfaces;
 using Application.Extensions;
 using Application.Interfaces;
-using Application.Models;
 using Application.Models.Requests;
-using Application.Nodes.Commands.Interfaces;
 using Application.Validators.Nodes;
 using Domain.Entities;
 using FluentValidation.Results;
 
-namespace Application.Nodes.Commands
+namespace Application.CommandHandling.Nodes
 {
     public class CreateNode
     {
-        public class Request : ValidatableRequest<Request, MutateNodeValidator<Request>>, IMutateNode
+        public class Command : ValidatableCommand<Command, MutateNodeValidator<Command>>, IMutateNode
         {
             public string Title { get; set; }
             public string ExternalId { get; set; }
@@ -22,7 +21,7 @@ namespace Application.Nodes.Commands
         }
     }
 
-    public class CreateNodeHandler : ValidatableRequestHandler<CreateNode.Request, MutateNodeValidator<CreateNode.Request>>
+    public class CreateNodeHandler : ValidatableCommandHandler<CreateNode.Command, MutateNodeValidator<CreateNode.Command>>
     {
         public CreateNodeHandler( IRepository repository )
         {
@@ -32,15 +31,12 @@ namespace Application.Nodes.Commands
 
                 if ( await repository.Exists<Node>( n => n.Title == x.Title ) )
                 {
-                    result.Errors.Add( new ValidationFailure( nameof( x.Title ),
-                        $"Node with {nameof( Node.Title )} '{x.Title}' already exists" ) );
+                    result.Errors.Add( new ValidationFailure( nameof( x.Title ), $"Node with {nameof( Node.Title )} '{x.Title}' already exists" ) );
                 }
 
-                if ( x.ExternalId != null &&
-                     await repository.Exists<Node>( n => n.ExternalId == x.ExternalId ) )
+                if ( x.ExternalId != null && await repository.Exists<Node>( n => n.ExternalId == x.ExternalId ) )
                 {
-                    result.Errors.Add( new ValidationFailure( nameof( x.ExternalId ),
-                        $"Node with {nameof( Node.ExternalId )} '{x.ExternalId}' already exists" ) );
+                    result.Errors.Add( new ValidationFailure( nameof( x.ExternalId ), $"Node with {nameof( Node.ExternalId )} '{x.ExternalId}' already exists" ) );
                 }
 
                 return result;

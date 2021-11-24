@@ -7,7 +7,7 @@ using Application.Models.Dtos;
 using Domain.Entities;
 using MediatR;
 
-namespace Application.Nodes.Queries
+namespace Application.QueryHandling.Nodes
 {
     public class NodeList
     {
@@ -31,6 +31,7 @@ namespace Application.Nodes.Queries
                 .Include( x => x.ConnectionDetails )
                 .ToListAsync( );
 
+            // Even if no nodes are found that's not technically invalid, it's a normal state to not have set up any nodes
             return QueryResult<List<NodeDto>>.Found( nodes
                 .Select( x => new NodeDto( x ) )
                 .ToList( ) );

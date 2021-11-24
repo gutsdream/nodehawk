@@ -1,15 +1,5 @@
-using System.Collections.Generic;
-using System.Linq;
-using Domain.Entities;
-
-namespace Application
+namespace Application.QueryHandling
 {
-    public interface IQueryResult<TContent>
-    {
-        public TContent Content { get; }
-        public Status State { get; }
-    }
-
     public class QueryResult<TContent> : IQueryResult<TContent> where TContent : class
     {
         public TContent Content { get; }
@@ -30,11 +20,5 @@ namespace Application
         {
             return new QueryResult<TContent>( null, Status.NotFound );
         }
-    }
-    
-    public enum Status
-    {
-        Found,
-        NotFound
     }
 }

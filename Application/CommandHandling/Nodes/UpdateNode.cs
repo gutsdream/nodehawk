@@ -1,19 +1,18 @@
 using System;
+using Application.CommandHandling.Nodes.Interfaces;
 using Application.Extensions;
 using Application.Interfaces;
-using Application.Models;
 using Application.Models.Requests;
-using Application.Nodes.Commands.Interfaces;
 using Application.Validators.Nodes;
 using Domain.Entities;
 using FluentValidation;
 using FluentValidation.Results;
 
-namespace Application.Nodes.Commands
+namespace Application.CommandHandling.Nodes
 {
     public class UpdateNode
     {
-        public class Request : ValidatableRequest<Request, Request.Validator>, IMutateNode
+        public class Command : ValidatableCommand<Command, Command.Validator>, IMutateNode
         {
             public Guid NodeId { get; set; }
             public string Title { get; set; }
@@ -23,7 +22,7 @@ namespace Application.Nodes.Commands
             public string Username { get; set; }
             public string Key { get; set; }
 
-            public class Validator : MutateNodeValidator<Request>
+            public class Validator : MutateNodeValidator<Command>
             {
                 public Validator( )
                 {
@@ -34,7 +33,7 @@ namespace Application.Nodes.Commands
         }
     }
 
-    public class UpdateNodeHandler : ValidatableRequestHandler<UpdateNode.Request, UpdateNode.Request.Validator>
+    public class UpdateNodeHandler : ValidatableCommandHandler<UpdateNode.Command, UpdateNode.Command.Validator>
     {
         public UpdateNodeHandler( IRepository repository )
         {

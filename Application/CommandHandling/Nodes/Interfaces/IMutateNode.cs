@@ -1,4 +1,4 @@
-namespace Application.Nodes.Commands.Interfaces
+namespace Application.CommandHandling.Nodes.Interfaces
 {
     public interface IMutateNode
     {

@@ -1,5 +1,5 @@
 using Application.Interfaces;
-using Application.Nodes.Queries;
+using Application.QueryHandling.Nodes;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

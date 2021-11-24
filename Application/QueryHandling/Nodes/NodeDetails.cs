@@ -6,7 +6,7 @@ using Application.Models.Dtos;
 using Domain.Entities;
 using MediatR;
 
-namespace Application.Nodes.Queries
+namespace Application.QueryHandling.Nodes
 {
     public class NodeDetails
     {

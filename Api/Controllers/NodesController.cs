@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Application.CommandHandling.Nodes;
 using Application.Models.Dtos;
-using Application.Nodes.Commands;
-using Application.Nodes.Queries;
-using Domain.Entities;
+using Application.QueryHandling.Nodes;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,9 +28,15 @@ namespace Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateNode( CreateNode.Request createNodeRequest )
+        public async Task<IActionResult> CreateNode( CreateNode.Command createNodeCommand )
         {
-            return Evaluate( await Mediator.Send( createNodeRequest ) );
+            return Evaluate( await Mediator.Send( createNodeCommand ) );
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> UpdateNode( UpdateNode.Command updateNodeCommand )
+        {
+            return Evaluate( await Mediator.Send( updateNodeCommand ) );
         }
     }
 }
