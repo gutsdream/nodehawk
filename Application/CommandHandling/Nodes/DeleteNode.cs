@@ -35,7 +35,7 @@ namespace Application.CommandHandling.Nodes
 
                 if ( !await repository.Exists<Node>( n => n.Id == x.NodeId ) )
                 {
-                    result.AddError( nameof( x.NodeId ), $"A node with {nameof( x.NodeId )} {x.NodeId} was not found." );
+                    result.AddError( nameof( x.NodeId ), $"A node with {nameof( x.NodeId )} '{x.NodeId}' was not found." );
                 }
 
                 return result;

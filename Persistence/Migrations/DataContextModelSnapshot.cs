@@ -28,9 +28,6 @@ namespace Persistence.Migrations
                     b.Property<string>("Key")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("NodeId")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Username")
                         .HasColumnType("TEXT");
 
@@ -66,6 +63,9 @@ namespace Persistence.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDateUtc")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("NodeId")

@@ -23,7 +23,7 @@ namespace Application.CommandHandling.Nodes
 
     public class CreateNodeHandler : ValidatableCommandHandler<CreateNode.Command, MutateNodeValidator<CreateNode.Command>>
     {
-        public CreateNodeHandler( IRepository repository )
+        public CreateNodeHandler( IRepository repository, ICypherService cypherService )
         {
             Validate( async x =>
             {
@@ -44,7 +44,9 @@ namespace Application.CommandHandling.Nodes
 
             OnSuccess( async x =>
             {
-                var connectionDetails = new ConnectionDetails( x.Host, x.Username, x.Key );
+                var connectionDetails = new ConnectionDetails( cypherService.Encrypt( x.Host ),
+                    cypherService.Encrypt( x.Username ),
+                    cypherService.Encrypt( x.Key ) );
 
                 var node = new Node( x.Title, connectionDetails, x.ExternalId );
                 await repository.AddAsync( node );

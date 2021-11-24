@@ -35,7 +35,7 @@ namespace Application.CommandHandling.Nodes
 
     public class UpdateNodeHandler : ValidatableCommandHandler<UpdateNode.Command, UpdateNode.Command.Validator>
     {
-        public UpdateNodeHandler( IRepository repository )
+        public UpdateNodeHandler( IRepository repository, ICypherService cypherService )
         {
             Validate( async x =>
             {
@@ -43,7 +43,7 @@ namespace Application.CommandHandling.Nodes
 
                 if ( !await repository.Exists<Node>( n => n.Id == x.NodeId ) )
                 {
-                    result.AddError( nameof( x.NodeId ), $"No node with {nameof( Node.Id )} of '{x.NodeId}' was found." );
+                    result.AddError( nameof( x.NodeId ), $"A node with {nameof( Node.Id )} '{x.NodeId}' was not found." );
                 }
 
                 if ( await repository.Exists<Node>( n => n.Title == x.Title && n.Id != x.NodeId ) )
@@ -62,7 +62,10 @@ namespace Application.CommandHandling.Nodes
             OnSuccess( async x =>
             {
                 var node = await repository.Get<Node>( ).FirstOrDefaultAsync( n => n.Id == x.NodeId );
-                var connectionDetails = new ConnectionDetails( x.Host, x.Username, x.Key );
+                
+                var connectionDetails = new ConnectionDetails( cypherService.Encrypt( x.Host ),
+                    cypherService.Encrypt( x.Username ),
+                    cypherService.Encrypt( x.Key ) );
 
                 node.SetConnectionDetails( connectionDetails );
                 node.SetTitle( x.Title );

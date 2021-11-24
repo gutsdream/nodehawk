@@ -6,7 +6,6 @@ namespace Domain.Entities
     public class ConnectionDetails
     {
         public Guid Id { get; protected set; }
-        public Guid NodeId { get; protected set; }
         public string Host { get; protected set; }
         public string Username { get; protected set; }
         public string Key { get; protected set; }

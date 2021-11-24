@@ -1,5 +1,6 @@
 using Application.Interfaces;
 using Application.QueryHandling.Nodes;
+using Infrastructure.Encryption;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -51,7 +52,10 @@ namespace Api
                     .WithOrigins( "http://localhost:3000" );
             } ) );
 
+            services.AddDataProtection( );
+
             services.AddScoped<IRepository, Repository>( );
+            services.AddSingleton<ICypherService, CypherService>( );
 
             services.AddMediatR( typeof( NodeListQueryHandler ).Assembly );
         }
