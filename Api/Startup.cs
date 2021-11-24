@@ -33,7 +33,11 @@ namespace Api
                     x.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                 } );
             
-            services.AddSwaggerGen( c => { c.SwaggerDoc( "v1", new OpenApiInfo { Title = "Api", Version = "v1" } ); } );
+            services.AddSwaggerGen( c =>
+            {
+                c.SwaggerDoc( "v1", new OpenApiInfo { Title = "Api", Version = "v1" } );
+                c.CustomSchemaIds( type => type.ToString( ) );
+            } );
 
             services.AddDbContext<DataContext>( opt =>
             {

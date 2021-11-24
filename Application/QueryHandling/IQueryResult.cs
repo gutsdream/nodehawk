@@ -1,6 +1,6 @@
 namespace Application.QueryHandling
 {
-    public interface IQueryResult<TContent>
+    public interface IQueryResult<out TContent>
     {
         public TContent Content { get; }
         public Status State { get; }

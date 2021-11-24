@@ -5,7 +5,7 @@ namespace Application.CommandHandling
 {
     public class CommandResult : ICommandResult
     {
-        public bool IsSuccessful => Errors.Any( );
+        public bool IsSuccessful => !Errors.Any( );
         public List<Error> Errors { get; }
 
         public CommandResult( )
@@ -15,7 +15,7 @@ namespace Application.CommandHandling
 
         public void AddError( Error error )
         {
-            Errors.Add(error);
+            Errors.Add( error );
         }
     }
 }
