@@ -43,21 +43,17 @@ namespace Application.CommandHandling.Nodes
 
                 if ( !await repository.Exists<Node>( n => n.Id == x.NodeId ) )
                 {
-                    result.Errors.Add( new ValidationFailure( nameof( x.NodeId ),
-                        $"No node with {nameof( Node.Id )} of '{x.NodeId}' was found." ) );
+                    result.AddError( nameof( x.NodeId ), $"No node with {nameof( Node.Id )} of '{x.NodeId}' was found." );
                 }
 
                 if ( await repository.Exists<Node>( n => n.Title == x.Title && n.Id != x.NodeId ) )
                 {
-                    result.Errors.Add( new ValidationFailure( nameof( x.Title ),
-                        $"A different node with {nameof( Node.Title )} '{x.Title}' already exists." ) );
+                    result.AddError( nameof( x.Title ), $"A different node with {nameof( Node.Title )} '{x.Title}' already exists." );
                 }
 
-                if ( x.ExternalId != null &&
-                     await repository.Exists<Node>( n => n.ExternalId == x.ExternalId && n.Id != x.NodeId) )
+                if ( x.ExternalId != null && await repository.Exists<Node>( n => n.ExternalId == x.ExternalId && n.Id != x.NodeId ) )
                 {
-                    result.Errors.Add( new ValidationFailure( nameof( x.ExternalId ),
-                        $"A different node with {nameof( Node.ExternalId )} '{x.ExternalId}' already exists." ) );
+                    result.AddError( nameof( x.ExternalId ), $"A different node with {nameof( Node.ExternalId )} '{x.ExternalId}' already exists." );
                 }
 
                 return result;
@@ -72,7 +68,7 @@ namespace Application.CommandHandling.Nodes
                 node.SetTitle( x.Title );
                 node.SetExternalId( x.ExternalId );
 
-                await repository.Save( );
+                await repository.SaveAsync( );
             } );
         }
     }

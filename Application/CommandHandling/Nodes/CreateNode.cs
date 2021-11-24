@@ -31,12 +31,12 @@ namespace Application.CommandHandling.Nodes
 
                 if ( await repository.Exists<Node>( n => n.Title == x.Title ) )
                 {
-                    result.Errors.Add( new ValidationFailure( nameof( x.Title ), $"Node with {nameof( Node.Title )} '{x.Title}' already exists" ) );
+                    result.AddError( nameof( x.Title ), $"Node with {nameof( Node.Title )} '{x.Title}' already exists" );
                 }
 
                 if ( x.ExternalId != null && await repository.Exists<Node>( n => n.ExternalId == x.ExternalId ) )
                 {
-                    result.Errors.Add( new ValidationFailure( nameof( x.ExternalId ), $"Node with {nameof( Node.ExternalId )} '{x.ExternalId}' already exists" ) );
+                    result.AddError( nameof( x.ExternalId ), $"Node with {nameof( Node.ExternalId )} '{x.ExternalId}' already exists" );
                 }
 
                 return result;
@@ -47,10 +47,10 @@ namespace Application.CommandHandling.Nodes
                 var connectionDetails = new ConnectionDetails( x.Host, x.Username, x.Key );
 
                 var node = new Node( x.Title, connectionDetails, x.ExternalId );
-                await repository.Add( node );
+                await repository.AddAsync( node );
 
                 //TODO: use a command post processor, remove Save from IRepository interface 
-                await repository.Save( );
+                await repository.SaveAsync( );
             } );
         }
     }

@@ -19,7 +19,7 @@ namespace Persistence
             _context = context;
         }
 
-        public async Task Add<TEntity>( TEntity entity ) where TEntity : class
+        public async Task AddAsync<TEntity>( TEntity entity ) where TEntity : class
         {
             await SetFor<TEntity>( ).AddAsync( entity );
         }
@@ -28,8 +28,13 @@ namespace Persistence
         {
             return new Evaluatable<TEntity>( SetFor<TEntity>( ) );
         }
+        
+        public void Remove<TEntity>( TEntity entity ) where TEntity : class
+        {
+            SetFor<TEntity>( ).Remove( entity );
+        }
 
-        public async Task Save( )
+        public async Task SaveAsync( )
         {
             await _context.SaveChangesAsync( );
         }

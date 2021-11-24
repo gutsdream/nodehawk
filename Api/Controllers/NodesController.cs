@@ -38,5 +38,11 @@ namespace Api.Controllers
         {
             return Evaluate( await Mediator.Send( updateNodeCommand ) );
         }
+        
+        [HttpPost]
+        public async Task<IActionResult> DeleteNode( DeleteNode.Command deleteNodeCommand )
+        {
+            return Evaluate( await Mediator.Send( deleteNodeCommand ) );
+        }
     }
 }
