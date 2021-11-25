@@ -1,5 +1,7 @@
 using Application.Interfaces;
 using Application.QueryHandling.Nodes;
+using Hangfire;
+using Hangfire.MemoryStorage;
 using Infrastructure.Encryption;
 using Infrastructure.Ssh;
 using MediatR;
@@ -12,7 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Persistence;
-using Renci.SshNet;
+using Scheduler.SnapshotScheduler;
 
 namespace Api
 {
@@ -31,21 +33,15 @@ namespace Api
         public void ConfigureServices( IServiceCollection services )
         {
             services.AddControllers( )
-                .AddNewtonsoftJson( x =>
-                {
-                    x.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                } );
-            
+                .AddNewtonsoftJson( x => { x.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; } );
+
             services.AddSwaggerGen( c =>
             {
                 c.SwaggerDoc( "v1", new OpenApiInfo { Title = "Api", Version = "v1" } );
                 c.CustomSchemaIds( type => type.ToString( ) );
             } );
 
-            services.AddDbContext<DataContext>( opt =>
-            {
-                opt.UseSqlite( Configuration.GetConnectionString( "DefaultConnection" ) );
-            } );
+            services.AddDbContext<DataContext>( opt => { opt.UseSqlite( Configuration.GetConnectionString( "DefaultConnection" ) ); } );
 
             services.AddCors( x => x.AddPolicy( CorsPolicyName, policy =>
             {
@@ -62,10 +58,20 @@ namespace Api
             services.AddScoped<INodeHawkSshClient, NodeHawkNodeHawkSshClient>( );
 
             services.AddMediatR( typeof( NodeListQueryHandler ).Assembly );
+
+            services.AddHangfire( x => { x.UseMemoryStorage( ); } );
+
+            services.AddHangfireServer( );
+            services.AddScoped<SnapshotJobManager, SnapshotJobManager>( );
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure( IApplicationBuilder app, IWebHostEnvironment env )
+        public void Configure( IApplicationBuilder app,
+            IWebHostEnvironment env,
+            IRecurringJobManager recurringJobManager,
+            IBackgroundJobClient backgroundJobManager,
+            SnapshotJobManager snapshotJobManager )
         {
             if ( env.IsDevelopment( ) )
             {
@@ -83,6 +89,11 @@ namespace Api
             app.UseAuthorization( );
 
             app.UseEndpoints( endpoints => { endpoints.MapControllers( ); } );
+
+            backgroundJobManager.Enqueue( ( ) => snapshotJobManager.SnapshotAll( ) );
+            recurringJobManager.AddOrUpdate( "Snapshot Generation: 15 Minute Interval", 
+                ( ) => snapshotJobManager.SnapshotAll(  ), 
+                "*/15 * * * *" );
         }
     }
 }

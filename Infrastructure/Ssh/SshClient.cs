@@ -39,8 +39,8 @@ namespace Infrastructure.Ssh
 
         public void Dispose( )
         {
-            _sshClient.Disconnect( );
-            _sshClient.Dispose( );
+            _sshClient?.Disconnect( );
+            _sshClient?.Dispose( );
         }
     }
 
