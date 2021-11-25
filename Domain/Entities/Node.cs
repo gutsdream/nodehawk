@@ -58,9 +58,9 @@ namespace Domain.Entities
             ExternalId = externalId;
         }
 
-        public void CreateSnapshot( int spaceUsedPercentage )
+        public void CreateSnapshot( int spaceUsedPercentage, bool containerRunning )
         {
-            var snapshot = new Snapshot( this, spaceUsedPercentage );
+            var snapshot = new Snapshot( this, spaceUsedPercentage, containerRunning );
             Snapshots.Add( snapshot );
         }
 
@@ -71,6 +71,8 @@ namespace Domain.Entities
 
             public int SpaceUsedPercentage { get; protected set; }
             public int SpaceAvailablePercentage => 100 - SpaceUsedPercentage;
+            
+            public bool ContainerRunning { get; protected set; }
 
             public DateTime CreatedDateUtc { get; protected set; }
 
@@ -81,10 +83,12 @@ namespace Domain.Entities
                 CreatedDateUtc = DateTime.UtcNow;
             }
 
-            protected internal Snapshot( Node node, int spaceUsedPercentage ) : this()
+            protected internal Snapshot( Node node, int spaceUsedPercentage, bool containerRunning ) : this()
             {
                 Throw.If.Null( node, nameof( node ) );
                 Node = node;
+
+                ContainerRunning = containerRunning;
 
                 SetSpaceUsed( spaceUsedPercentage );
             }

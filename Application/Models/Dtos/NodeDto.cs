@@ -8,14 +8,19 @@ namespace Application.Models.Dtos
         public Guid Id { get;  }
         public string Title { get; }
         public string ExternalId { get;  }
+        
         public int? SpaceUsedPercentage { get; }
+        public bool ContainerRunning { get; }
 
         public NodeDto( Node node )
         {
             Id = node.Id;
             Title = node.Title;
             ExternalId = node.ExternalId;
-            SpaceUsedPercentage = node.MostRecentSnapshot?.SpaceUsedPercentage;
+            
+            var snapshot = node.MostRecentSnapshot;
+            SpaceUsedPercentage = snapshot?.SpaceUsedPercentage;
+            ContainerRunning = snapshot?.ContainerRunning ?? false;
         }
     }
 }

@@ -18,6 +18,7 @@ namespace Scheduler
             _mediator = mediator;
         }
 
+        // TODO: allow requests to be used directly (queueing IRequest)
         public void CreateNodeSnapshot( Guid nodeId )
         {
             _backgroundJobClient.Enqueue( ( ) => GenerateSnapshot( nodeId ) );

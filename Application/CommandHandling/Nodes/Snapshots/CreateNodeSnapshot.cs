@@ -48,11 +48,14 @@ namespace Application.CommandHandling.Nodes.Snapshots
                     .FirstAsync( n => n.Id == x.NodeId );
 
                 nodeHawkSshClient.ConnectToNode( node );
-                var result = nodeHawkSshClient.Run( "df ." );
+                var dfCommandResult = nodeHawkSshClient.Run( "df ." );
 
-                var spaceUsed = GetSpaceUsedPercentageFromSshResult( result );
+                var spaceUsed = GetSpaceUsedPercentageFromSshResult( dfCommandResult );
+                
+                var containerRunningResult = nodeHawkSshClient.Run( "docker container inspect -f '{{.State.Running}}' otnode" );
+                var containerRunning = containerRunningResult.Content.Contains( "true" );
 
-                node.CreateSnapshot( spaceUsed );
+                node.CreateSnapshot( spaceUsed, containerRunning );
 
                 //TODO: use a command post processor, remove Save from IRepository interface 
                 await repository.SaveAsync( );
