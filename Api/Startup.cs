@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Application.QueryHandling.Nodes;
 using Infrastructure.Encryption;
+using Infrastructure.Ssh;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Persistence;
+using Renci.SshNet;
 
 namespace Api
 {
@@ -56,6 +58,8 @@ namespace Api
 
             services.AddScoped<IRepository, Repository>( );
             services.AddSingleton<ICypherService, CypherService>( );
+            // services.AddScoped<SshClient, SshClient>( );
+            services.AddScoped<INodeHawkSshClient, NodeHawkNodeHawkSshClient>( );
 
             services.AddMediatR( typeof( NodeListQueryHandler ).Assembly );
         }

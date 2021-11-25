@@ -22,6 +22,7 @@ namespace Domain.Entities
 
         protected Node( )
         {
+            Snapshots = new HashSet<Snapshot>( );
         }
 
         public Node( string title, ConnectionDetails connectionDetails, string externalId = null )

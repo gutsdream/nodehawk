@@ -10,7 +10,7 @@ namespace Domain.ExceptionHandling
             {
                 if ( nullable == null )
                 {
-                    throw new ArgumentNullException( $"{name} must not be null." );
+                    throw new ArgumentNullException( name );
                 }
             }
 

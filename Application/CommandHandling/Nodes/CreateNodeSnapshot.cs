@@ -8,7 +8,7 @@ using FluentValidation.Results;
 
 namespace Application.CommandHandling.Nodes
 {
-    public class DeleteNode
+    public class CreateNodeSnapshot
     {
         public class Command : ValidatableCommand<Command, Command.Validator>
         {
@@ -25,9 +25,9 @@ namespace Application.CommandHandling.Nodes
         }
     }
 
-    public class DeleteNodeHandler : ValidatableCommandHandler<DeleteNode.Command, DeleteNode.Command.Validator>
+    public class CreateNodeSnapshotHandler : ValidatableCommandHandler<CreateNodeSnapshot.Command, CreateNodeSnapshot.Command.Validator>
     {
-        public DeleteNodeHandler( IRepository repository )
+        public CreateNodeSnapshotHandler( IRepository repository, INodeHawkSshClient nodeHawkSshClient )
         {
             Validate( async x =>
             {
@@ -46,11 +46,30 @@ namespace Application.CommandHandling.Nodes
                 var node = await repository.Get<Node>( )
                     .Include( x => x.ConnectionDetails )
                     .FirstAsync( n => n.Id == x.NodeId );
-                repository.Remove( node.ConnectionDetails );
-                repository.Remove( node );
 
+                nodeHawkSshClient.ConnectToNode( node );
+                var result = nodeHawkSshClient.Run( "df ." );
+
+                var spaceUsed = GetSpaceUsedPercentageFromSshResult( result );
+
+                node.CreateSnapshot( spaceUsed );
+
+                //TODO: use a command post processor, remove Save from IRepository interface 
                 await repository.SaveAsync( );
             } );
+        }
+
+        private static int GetSpaceUsedPercentageFromSshResult( ISshCommandResult result )
+        {
+            return result.Content
+                .SplitToList( )
+                // Remove whitespace and line breaks
+                .Ignore( string.Empty, " ", "/\n" )
+                .FindWord( "Mounted" )
+                .SkipWords( 5 )
+                .Get( )
+                .RemoveNonNumericCharacters( )
+                .AsInt( );
         }
     }
 }

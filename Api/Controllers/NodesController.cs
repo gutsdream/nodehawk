@@ -28,21 +28,27 @@ namespace Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateNode( CreateNode.Command createNodeCommand )
+        public async Task<IActionResult> Create( CreateNode.Command createNodeCommand )
         {
             return Evaluate( await Mediator.Send( createNodeCommand ) );
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateNode( UpdateNode.Command updateNodeCommand )
+        public async Task<IActionResult> Update( UpdateNode.Command updateNodeCommand )
         {
             return Evaluate( await Mediator.Send( updateNodeCommand ) );
         }
         
         [HttpPost]
-        public async Task<IActionResult> DeleteNode( DeleteNode.Command deleteNodeCommand )
+        public async Task<IActionResult> Delete( DeleteNode.Command deleteNodeCommand )
         {
             return Evaluate( await Mediator.Send( deleteNodeCommand ) );
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> CreateSnapshot( CreateNodeSnapshot.Command createNodeSnapshotCommand )
+        {
+            return Evaluate( await Mediator.Send( createNodeSnapshotCommand ) );
         }
     }
 }
