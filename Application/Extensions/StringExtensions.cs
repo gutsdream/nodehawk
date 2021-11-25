@@ -8,8 +8,8 @@ namespace Application.Extensions
     {
         public static List<string> SplitToList( this string value )
         {
-            return value == null 
-                ? new List<string>( ) 
+            return value == null
+                ? new List<string>( )
                 : value.Split( ' ' ).ToList( );
         }
 
@@ -22,8 +22,8 @@ namespace Application.Extensions
 
         public static string RemoveNonNumericCharacters( this string impureString )
         {
-            return impureString == null 
-                ? null 
+            return impureString == null
+                ? null
                 : new string( impureString.Where( char.IsDigit ).ToArray( ) );
         }
 

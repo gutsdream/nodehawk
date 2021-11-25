@@ -1,4 +1,5 @@
 using System;
+using Application.Constants;
 using Application.Extensions;
 using Application.Interfaces;
 using Application.Models.Requests;
@@ -44,16 +45,13 @@ namespace Application.CommandHandling.Nodes.Snapshots
             OnSuccess( async x =>
             {
                 var node = await repository.Get<Node>( )
-                    .Include( x => x.ConnectionDetails )
+                    .Include( n => n.ConnectionDetails )
                     .FirstAsync( n => n.Id == x.NodeId );
 
                 nodeHawkSshClient.ConnectToNode( node );
-                var dfCommandResult = nodeHawkSshClient.Run( "df ." );
-
-                var spaceUsed = GetSpaceUsedPercentageFromSshResult( dfCommandResult );
                 
-                var containerRunningResult = nodeHawkSshClient.Run( "docker container inspect -f '{{.State.Running}}' otnode" );
-                var containerRunning = containerRunningResult.Content.Contains( "true" );
+                int spaceUsed = GetSpaceUsed( nodeHawkSshClient );
+                bool containerRunning = IsContainerRunning( nodeHawkSshClient );
 
                 node.CreateSnapshot( spaceUsed, containerRunning );
 
@@ -62,6 +60,24 @@ namespace Application.CommandHandling.Nodes.Snapshots
             } );
         }
 
+        private static bool IsContainerRunning( INodeHawkSshClient nodeHawkSshClient )
+        {
+            var containerRunningResult = nodeHawkSshClient.Run( SshCommands.IsContainerRunning );
+            var containerRunning = containerRunningResult.Content.Contains( "true" );
+            return containerRunning;
+        }
+
+        private static int GetSpaceUsed( INodeHawkSshClient nodeHawkSshClient )
+        {
+            var dfCommandResult = nodeHawkSshClient.Run( SshCommands.GetDiskSpace );
+            var spaceUsed = GetSpaceUsedPercentageFromSshResult( dfCommandResult );
+            
+            return spaceUsed;
+        }
+
+        /// <summary>
+        /// Parses the response of a CLI 'df .h' command
+        /// </summary>
         private static int GetSpaceUsedPercentageFromSshResult( ISshCommandResult result )
         {
             return result.Content

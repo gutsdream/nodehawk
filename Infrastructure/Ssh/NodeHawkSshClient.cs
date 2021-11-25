@@ -1,4 +1,5 @@
 using System;
+using Application.Constants;
 using Application.Interfaces;
 using Domain.Entities;
 using Renci.SshNet;
@@ -27,13 +28,13 @@ namespace Infrastructure.Ssh
             _sshClient.Connect();
         }
 
-        public ISshCommandResult Run( string commandString )
+        public ISshCommandResult Run( SshCommands.Command nodeHawkSshCommand )
         {
             if ( !_sshClient.IsConnected )
             {
                 throw new InvalidOperationException( $"Must run {nameof( ConnectToNode )} before running commands" );
             }
-            var command = _sshClient.RunCommand( commandString );
+            var command = _sshClient.RunCommand( nodeHawkSshCommand.Value );
             return new SshCommandResult( command );
         }
 

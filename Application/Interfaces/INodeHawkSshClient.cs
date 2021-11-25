@@ -1,3 +1,4 @@
+using Application.Constants;
 using Domain.Entities;
 
 namespace Application.Interfaces
@@ -5,7 +6,7 @@ namespace Application.Interfaces
     public interface INodeHawkSshClient
     {
         void ConnectToNode( Node node );
-        ISshCommandResult Run( string command );
+        ISshCommandResult Run( SshCommands.Command command );
     }
 
     public interface ISshCommandResult
