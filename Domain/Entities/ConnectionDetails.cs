@@ -16,8 +16,7 @@ namespace Domain.Entities
         {
         }
 
-        // TODO: encryption
-        public ConnectionDetails( string host, string username, string key )
+        public ConnectionDetails( string host, string username, string key ) : this()
         {
             Throw.If.Null( host, nameof( host ) );
             Throw.If.Null( username, nameof( username ) );

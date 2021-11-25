@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Domain.Constants;
 using Domain.ExceptionHandling;
 
@@ -17,6 +18,8 @@ namespace Domain.Entities
         /// </summary>
         public string ExternalId { get; set; }
 
+        public Snapshot MostRecentSnapshot => Snapshots.OrderByDescending( x => x.CreatedDateUtc ).FirstOrDefault( );
+
         public virtual ConnectionDetails ConnectionDetails { get; protected set; }
         public virtual ICollection<Snapshot> Snapshots { get; protected set; }
 
@@ -25,7 +28,7 @@ namespace Domain.Entities
             Snapshots = new HashSet<Snapshot>( );
         }
 
-        public Node( string title, ConnectionDetails connectionDetails, string externalId = null )
+        public Node( string title, ConnectionDetails connectionDetails, string externalId = null ) : this()
         {
             SetTitle( title );
             SetConnectionDetails( connectionDetails );
@@ -55,12 +58,10 @@ namespace Domain.Entities
             ExternalId = externalId;
         }
 
-        public Snapshot CreateSnapshot( int spaceUsedPercentage )
+        public void CreateSnapshot( int spaceUsedPercentage )
         {
             var snapshot = new Snapshot( this, spaceUsedPercentage );
             Snapshots.Add( snapshot );
-
-            return snapshot;
         }
 
         public class Snapshot
@@ -80,7 +81,7 @@ namespace Domain.Entities
                 CreatedDateUtc = DateTime.UtcNow;
             }
 
-            protected internal Snapshot( Node node, int spaceUsedPercentage )
+            protected internal Snapshot( Node node, int spaceUsedPercentage ) : this()
             {
                 Throw.If.Null( node, nameof( node ) );
                 Node = node;

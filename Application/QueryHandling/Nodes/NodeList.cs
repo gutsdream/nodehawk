@@ -28,7 +28,7 @@ namespace Application.QueryHandling.Nodes
         public async Task<IQueryResult<List<NodeDto>>> Handle( NodeList.Query request, CancellationToken cancellationToken )
         {
             var nodes = await _repository.Get<Node>( )
-                .Include( x => x.ConnectionDetails )
+                .Include( x => x.Snapshots )
                 .ToListAsync( );
 
             // Even if no nodes are found that's not technically invalid, it's a normal state to not have set up any nodes

@@ -33,7 +33,7 @@ namespace Application.QueryHandling.Nodes
         public async Task<IQueryResult<NodeDto>> Handle( NodeDetails.Query request, CancellationToken cancellationToken )
         {
             var node = await _repository.Get<Node>( )
-                .Include( x => x.ConnectionDetails )
+                .Include( x => x.Snapshots )
                 .FirstOrDefaultAsync( x => x.Id == request.Id );
 
             return node != null
