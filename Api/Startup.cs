@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Persistence;
+using Scheduler;
 using Scheduler.SnapshotScheduler;
 
 namespace Api
@@ -60,9 +61,9 @@ namespace Api
             services.AddMediatR( typeof( NodeListQueryHandler ).Assembly );
 
             services.AddHangfire( x => { x.UseMemoryStorage( ); } );
-
             services.AddHangfireServer( );
             services.AddScoped<SnapshotJobManager, SnapshotJobManager>( );
+            services.AddScoped<IBackgroundTaskManager, BackgroundTaskManager>( );
 
         }
 

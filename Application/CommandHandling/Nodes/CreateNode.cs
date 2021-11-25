@@ -23,7 +23,7 @@ namespace Application.CommandHandling.Nodes
 
     public class CreateNodeHandler : ValidatableCommandHandler<CreateNode.Command, MutateNodeValidator<CreateNode.Command>>
     {
-        public CreateNodeHandler( IRepository repository, ICypherService cypherService )
+        public CreateNodeHandler( IRepository repository, ICypherService cypherService, IBackgroundTaskManager backgroundTaskManager )
         {
             Validate( async x =>
             {
@@ -53,6 +53,9 @@ namespace Application.CommandHandling.Nodes
 
                 //TODO: use a command post processor, remove Save from IRepository interface 
                 await repository.SaveAsync( );
+
+                //TODO: raise an event, make it out of process somehow
+                backgroundTaskManager.CreateNodeSnapshot( node.Id );
             } );
         }
     }

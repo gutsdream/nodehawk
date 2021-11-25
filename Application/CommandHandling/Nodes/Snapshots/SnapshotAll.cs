@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Interfaces;
@@ -9,38 +8,32 @@ namespace Application.CommandHandling.Nodes.Snapshots
 {
     public class SnapshotAll
     {
-        public class Command : IRequest<ICommandResult>
+        public class Command : IRequest
         {
         }
     }
     
-    public class SnapshotAllCommandHandler :IRequestHandler<SnapshotAll.Command, ICommandResult>
+    public class SnapshotAllCommandHandler :IRequestHandler<SnapshotAll.Command>
     {
         private readonly IMediator _mediator;
         private readonly IRepository _repository;
 
-        public SnapshotAllCommandHandler( IMediator mediator, IRepository repository  )
+        public SnapshotAllCommandHandler( IMediator mediator, IRepository repository )
         {
             _mediator = mediator;
             _repository = repository;
         }
-        public async Task<ICommandResult> Handle( SnapshotAll.Command request, CancellationToken cancellationToken )
+        public async Task<Unit> Handle( SnapshotAll.Command request, CancellationToken cancellationToken )
         {
             var nodes = await _repository.Get<Node>( ).ToListAsync( );
-            var errors = new List<Error>( );
-            foreach ( var node in nodes )
-            {
-                var result = await _mediator.Send( new CreateNodeSnapshot.Command { NodeId = node.Id } );
-                errors.AddRange(result.Errors);
-            }
+            nodes.ForEach( SnapshotNode );
+            
+            return Unit.Value;
+        }
 
-            var commandResult = new CommandResult( );
-            foreach ( var error in errors )
-            {
-                commandResult.AddError(error);
-            }
-
-            return commandResult;
+        private async void SnapshotNode( Node node )
+        {
+            await _mediator.Send( new CreateNodeSnapshot.Command { NodeId = node.Id } );
         }
     }
 }
