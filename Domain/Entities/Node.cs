@@ -89,7 +89,7 @@ namespace Domain.Entities
                 SetSpaceUsed( spaceUsedPercentage );
             }
 
-            public void SetSpaceUsed( int spaceUsed )
+            private void SetSpaceUsed( int spaceUsed )
             {
                 Throw.If.Null( spaceUsed, nameof( spaceUsed ) );
                 Throw.IfNot.Percentage( spaceUsed, nameof( spaceUsed ) );
