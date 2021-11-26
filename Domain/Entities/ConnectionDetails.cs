@@ -1,4 +1,3 @@
-using System;
 using Domain.ExceptionHandling;
 
 namespace Domain.Entities

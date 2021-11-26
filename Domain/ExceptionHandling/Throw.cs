@@ -14,11 +14,11 @@ namespace Domain.ExceptionHandling
                 }
             }
 
-            public static void InvalidLength( string value, string name, int length )
+            public static void InvalidLength( string value, string name, int expectedLength )
             {
-                if ( value.Length != length )
+                if ( value == null || value.Length != expectedLength )
                 {
-                    throw new ArgumentException( $"{name} must have length of {length}." );
+                    throw new ArgumentException( $"{name} must have length of {expectedLength}." );
                 }
             }
         }

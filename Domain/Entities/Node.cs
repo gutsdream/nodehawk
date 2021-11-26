@@ -83,9 +83,7 @@ namespace Domain.Entities
 
             protected internal Snapshot( Node node, int spaceUsedPercentage, bool containerRunning ) : this()
             {
-                Throw.If.Null( node, nameof( node ) );
                 Node = node;
-
                 ContainerRunning = containerRunning;
 
                 SetSpaceUsed( spaceUsedPercentage );
