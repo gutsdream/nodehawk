@@ -46,6 +46,7 @@ namespace Application.CommandHandling.Nodes.Snapshots
             {
                 var node = await repository.Get<Node>( )
                     .Include( n => n.ConnectionDetails )
+                    .Include( n => n.Snapshots )
                     .FirstAsync( n => n.Id == x.NodeId );
 
                 nodeHawkSshClient.ConnectToNode( node );

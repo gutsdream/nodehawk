@@ -1,4 +1,5 @@
 using Application.CommandHandling.Nodes.Interfaces;
+using Application.CommandHandling.Nodes.Snapshots;
 using Application.Extensions;
 using Application.Interfaces;
 using Application.Models.Requests;
@@ -31,12 +32,12 @@ namespace Application.CommandHandling.Nodes
 
                 if ( await repository.Exists<Node>( n => n.Title == x.Title ) )
                 {
-                    result.AddError( nameof( x.Title ), $"Node with {nameof( Node.Title )} '{x.Title}' already exists" );
+                    result.AddError( nameof( x.Title ), $"Node with {nameof( Node.Title )} '{x.Title}' already exists." );
                 }
 
                 if ( x.ExternalId != null && await repository.Exists<Node>( n => n.ExternalId == x.ExternalId ) )
                 {
-                    result.AddError( nameof( x.ExternalId ), $"Node with {nameof( Node.ExternalId )} '{x.ExternalId}' already exists" );
+                    result.AddError( nameof( x.ExternalId ), $"Node with {nameof( Node.ExternalId )} '{x.ExternalId}' already exists." );
                 }
 
                 return result;
@@ -49,13 +50,13 @@ namespace Application.CommandHandling.Nodes
                     cypherService.Encrypt( x.Key ) );
 
                 var node = new Node( x.Title, connectionDetails, x.ExternalId );
-                await repository.AddAsync( node );
-
+                repository.Add( node );
+                
                 //TODO: use a command post processor, remove Save from IRepository interface 
                 await repository.SaveAsync( );
-
-                //TODO: raise an event, make it out of process somehow
-                backgroundTaskManager.CreateNodeSnapshot( node.Id );
+                
+                // TODO: Move into SaveAsync eventhandler thing
+                backgroundTaskManager.QueueRequest<CreateNodeSnapshot.Command, ICommandResult>( new CreateNodeSnapshot.Command{ NodeId = node.Id } );
             } );
         }
     }

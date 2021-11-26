@@ -19,9 +19,9 @@ namespace Persistence
             _context = context;
         }
 
-        public async Task AddAsync<TEntity>( TEntity entity ) where TEntity : class
+        public void Add<TEntity>( TEntity entity ) where TEntity : class
         {
-            await SetFor<TEntity>( ).AddAsync( entity );
+            SetFor<TEntity>( ).Add( entity );
         }
 
         public IEvaluatable<TEntity> Get<TEntity>( ) where TEntity : class

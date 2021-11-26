@@ -3,9 +3,8 @@ using Domain.ExceptionHandling;
 
 namespace Domain.Entities
 {
-    public class ConnectionDetails
+    public class ConnectionDetails : Entity
     {
-        public Guid Id { get; protected set; }
         public string Host { get; protected set; }
         public string Username { get; protected set; }
         public string Key { get; protected set; }

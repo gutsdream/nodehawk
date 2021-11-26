@@ -6,9 +6,8 @@ using Domain.ExceptionHandling;
 
 namespace Domain.Entities
 {
-    public class Node
+    public class Node : Entity
     {
-        public Guid Id { get; protected set; }
         public Guid ConnectionDetailsId { get; protected set; }
 
         public string Title { get; set; }
@@ -64,9 +63,8 @@ namespace Domain.Entities
             Snapshots.Add( snapshot );
         }
 
-        public class Snapshot
+        public class Snapshot : Entity
         {
-            public Guid Id { get; protected set; }
             public Guid NodeId { get; protected set; }
 
             public int SpaceUsedPercentage { get; protected set; }

@@ -7,7 +7,7 @@ namespace Application.Interfaces
 {
     public interface IRepository
     {
-        Task AddAsync<TEntity>( TEntity entity ) where TEntity : class;
+        void Add<TEntity>( TEntity entity ) where TEntity : class;
         IEvaluatable<TEntity> Get<TEntity>( ) where TEntity : class;
         void Remove<TEntity>( TEntity entity ) where TEntity : class;
         Task SaveAsync( );
