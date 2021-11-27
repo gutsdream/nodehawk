@@ -1,5 +1,6 @@
 using System;
 using Application.CommandHandling.Nodes.Interfaces;
+using Application.CommandHandling.Nodes.Snapshots;
 using Application.Extensions;
 using Application.Interfaces;
 using Application.Models.Requests;
@@ -35,7 +36,7 @@ namespace Application.CommandHandling.Nodes
 
     public class UpdateNodeHandler : ValidatableCommandHandler<UpdateNode.Command, UpdateNode.Command.Validator>
     {
-        public UpdateNodeHandler( IRepository repository, ICypherService cypherService )
+        public UpdateNodeHandler( IRepository repository, ICypherService cypherService, IBackgroundTaskManager backgroundTaskManager )
         {
             Validate( async x =>
             {
@@ -48,12 +49,12 @@ namespace Application.CommandHandling.Nodes
 
                 if ( await repository.Exists<Node>( n => n.Title == x.Title && n.Id != x.NodeId ) )
                 {
-                    result.AddError( nameof( x.Title ), $"A different node with {nameof( Node.Title )} '{x.Title}' already exists." );
+                    result.AddError( nameof( x.Title ), $"Different node with {nameof( Node.Title )} '{x.Title}' already exists." );
                 }
 
                 if ( x.ExternalId != null && await repository.Exists<Node>( n => n.ExternalId == x.ExternalId && n.Id != x.NodeId ) )
                 {
-                    result.AddError( nameof( x.ExternalId ), $"A different node with {nameof( Node.ExternalId )} '{x.ExternalId}' already exists." );
+                    result.AddError( nameof( x.ExternalId ), $"Different node with {nameof( Node.ExternalId )} '{x.ExternalId}' already exists." );
                 }
 
                 return result;
@@ -62,7 +63,7 @@ namespace Application.CommandHandling.Nodes
             OnSuccess( async x =>
             {
                 var node = await repository.Get<Node>( ).FirstOrDefaultAsync( n => n.Id == x.NodeId );
-                
+
                 var connectionDetails = new ConnectionDetails( cypherService.Encrypt( x.Host ),
                     cypherService.Encrypt( x.Username ),
                     cypherService.Encrypt( x.Key ) );
@@ -72,6 +73,8 @@ namespace Application.CommandHandling.Nodes
                 node.SetExternalId( x.ExternalId );
 
                 await repository.SaveAsync( );
+
+                backgroundTaskManager.QueueRequest<CreateNodeSnapshot.Command, ICommandResult>( new CreateNodeSnapshot.Command { NodeId = node.Id } );
             } );
         }
     }

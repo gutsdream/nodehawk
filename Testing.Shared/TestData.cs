@@ -1,3 +1,4 @@
+using System;
 using Domain.Entities;
 
 namespace Domain.Testing
@@ -8,12 +9,12 @@ namespace Domain.Testing
         {
             public static Node Node( )
             {
-                return new Node( "title", ConnectionDetails( ) );
+                return new Node( "title", ConnectionDetails( ) ) { Id = Guid.NewGuid( ) };
             }
 
             public static ConnectionDetails ConnectionDetails( )
             {
-                return new ConnectionDetails( "host", "username", "key" );
+                return new ConnectionDetails( "host", "username", "key" ) { Id = Guid.NewGuid( ) };
             }
         }
     }
