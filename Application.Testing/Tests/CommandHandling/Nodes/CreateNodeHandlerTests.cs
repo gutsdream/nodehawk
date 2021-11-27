@@ -9,7 +9,7 @@ using Application.Testing.Mocks;
 using Domain.Entities;
 using Xunit;
 
-namespace Application.Testing.Tests.CommandHandling
+namespace Application.Testing.Tests.CommandHandling.Nodes
 {
     public class CreateNodeHandlerTests
     {
