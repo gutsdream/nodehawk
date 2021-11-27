@@ -28,8 +28,8 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             _repositoryMock.WithEntitiesFor( ( ) => _nodes );
 
             _backgroundTaskManagerMock = new BackgroundTaskManagerMock( );
-            _backgroundTaskManagerMock.ConfigureQueue<CreateNodeSnapshot.Command, ICommandResult>(  );
-            
+            _backgroundTaskManagerMock.ConfigureQueue<CreateNodeSnapshot.Command, ICommandResult>( );
+
             var cypherServiceMock = new CypherServiceMock( );
 
             _createNodeHandler = new CreateNodeHandler( _repositoryMock.Object,

@@ -12,7 +12,7 @@ namespace Application.Testing.Mocks
         private readonly List<object> _queuedRequests = new( );
 
         public BackgroundTaskManagerMock( )
-        {
+        {  
         }
 
         // TODO: can we do this in a not aids way :D
@@ -36,7 +36,7 @@ namespace Application.Testing.Mocks
     {
         public bool Matches( Type typeArgument )
         {
-            return typeof( TRequest ).IsAssignableFrom( typeArgument );
+            return true;
         }
     };
 }

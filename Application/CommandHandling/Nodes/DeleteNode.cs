@@ -44,7 +44,7 @@ namespace Application.CommandHandling.Nodes
             OnSuccess( async x =>
             {
                 var node = await repository.Get<Node>( )
-                    .Include( x => x.ConnectionDetails )
+                    .Include( n => n.ConnectionDetails )
                     .FirstAsync( n => n.Id == x.NodeId );
                 repository.Remove( node.ConnectionDetails );
                 repository.Remove( node );
