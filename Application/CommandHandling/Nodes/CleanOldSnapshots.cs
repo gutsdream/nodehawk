@@ -16,7 +16,6 @@ namespace Application.CommandHandling.Nodes
             {
                 public Validator( )
                 {
-                    RuleFor( x => x.CleanBefore ).NotNull( );
                     RuleFor( x => x.CleanBefore ).NotEqual( ( TimeSpan ) default );
                 }
             }

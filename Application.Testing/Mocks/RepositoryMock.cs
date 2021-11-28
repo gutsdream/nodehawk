@@ -9,16 +9,21 @@ namespace Application.Testing.Mocks
 {
     public class RepositoryMock : Mock<IRepository>
     {
-        private List<object> _entities;
+        private List<object> _entities = new( );
+        // private bool entitiesSet = false;
 
         public void WithEntitiesFor<TEntity>( Func<List<TEntity>> invokableEntities ) where TEntity : class
         {
-            _entities = new List<object>( );
-
+            bool entitiesSet = false;
             Setup( x => x.Get<TEntity>( ) ).Returns( ( ) =>
             {
-                var entities = invokableEntities.Invoke( );
-                return new EvaluatableMock<TEntity>( entities ).Object;
+                
+                if ( !entitiesSet )
+                {
+                    entitiesSet = true;
+                    _entities.AddRange(  invokableEntities.Invoke( ));
+                }
+                return new EvaluatableMock<TEntity>( _entities.OfType<TEntity>().ToList() ).Object;
             } );
 
             Setup( x => x.Add( It.IsAny<TEntity>( ) ) ).Callback( ( TEntity entity ) => { _entities.Add( entity ); } );
@@ -33,7 +38,7 @@ namespace Application.Testing.Mocks
 
         public bool DoesNotContain<TEntity>( Func<TEntity, bool> predicate ) where TEntity : class
         {
-            return !_entities.OfType<TEntity>( ).Any( predicate );
+            return !Contains( predicate );
         }
     }
 
@@ -54,7 +59,7 @@ namespace Application.Testing.Mocks
             Setup( x => x.Include( It.IsAny<Expression<Func<TEntity, It.IsAnyType>>>( ) ) ).Returns( new InvocationFunc( invocation =>
             {
                 return new EvaluatableMock<TEntity>( _entities ).Object;
-            }) );
+            } ) );
 
             Setup( x => x.AnyAsync( It.IsAny<Expression<Func<TEntity, bool>>>( ) ) ).Returns( async ( Expression<Func<TEntity, bool>> func ) =>
             {

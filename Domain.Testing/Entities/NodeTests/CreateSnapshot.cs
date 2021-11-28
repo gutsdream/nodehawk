@@ -1,5 +1,6 @@
 using System.Linq;
 using Domain.Entities;
+using Testing.Shared;
 using Xunit;
 
 namespace Domain.Testing.Entities.NodeTests

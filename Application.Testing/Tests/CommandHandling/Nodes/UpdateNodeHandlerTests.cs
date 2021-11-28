@@ -8,7 +8,7 @@ using Application.CommandHandling.Nodes.Interfaces;
 using Application.CommandHandling.Nodes.Snapshots;
 using Application.Testing.Mocks;
 using Domain.Entities;
-using Domain.Testing;
+using Testing.Shared;
 using Xunit;
 
 namespace Application.Testing.Tests.CommandHandling.Nodes

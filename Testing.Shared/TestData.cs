@@ -1,7 +1,7 @@
 using System;
 using Domain.Entities;
 
-namespace Domain.Testing
+namespace Testing.Shared
 {
     public static class TestData
     {

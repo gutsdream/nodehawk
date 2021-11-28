@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Application.CommandHandling.Nodes;
 using Application.Testing.Mocks;
 using Domain.Entities;
-using Domain.Testing;
+using Testing.Shared;
 using Xunit;
 
 namespace Application.Testing.Tests.CommandHandling.Nodes
