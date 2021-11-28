@@ -10,7 +10,6 @@ namespace Application.Testing.Mocks
     public class RepositoryMock : Mock<IRepository>
     {
         private List<object> _entities = new( );
-        // private bool entitiesSet = false;
 
         public void WithEntitiesFor<TEntity>( Func<List<TEntity>> invokableEntities ) where TEntity : class
         {
