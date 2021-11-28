@@ -42,7 +42,7 @@ namespace Application.CommandHandling.Nodes.Snapshots
                 return result;
             } );
 
-            OnSuccess( async x =>
+            OnSuccessfulValidation( async x =>
             {
                 var node = await repository.Get<Node>( )
                     .Include( n => n.ConnectionDetails )

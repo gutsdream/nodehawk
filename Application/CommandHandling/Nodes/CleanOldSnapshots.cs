@@ -27,7 +27,7 @@ namespace Application.CommandHandling.Nodes
     {
         public CleanOldSnapshotsHandler( IRepository repository )
         {
-            OnSuccess( async x =>
+            OnSuccessfulValidation( async x =>
             {
                 var removeBeforeDate = DateTime.UtcNow.Add( x.CleanBefore * -1 );
                 var snapshotsToRemove = await repository.Get<Node.Snapshot>( ).Where( n => n.CreatedDateUtc <= removeBeforeDate ).ToListAsync( );

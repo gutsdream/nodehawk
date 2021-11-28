@@ -43,7 +43,7 @@ namespace Application.CommandHandling.Nodes
                 return result;
             } );
 
-            OnSuccess( async x =>
+            OnSuccessfulValidation( async x =>
             {
                 var connectionDetails = new ConnectionDetails( cypherService.Encrypt( x.Host ),
                     cypherService.Encrypt( x.Username ),

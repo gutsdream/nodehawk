@@ -35,7 +35,7 @@ namespace Application
         /// <summary>
         /// Action to be done upon successful validation.
         /// </summary>
-        protected void OnSuccess( Func<TCommand, Task> onSuccessFunc )
+        protected void OnSuccessfulValidation( Func<TCommand, Task> onSuccessFunc )
         {
             _onSuccess = onSuccessFunc;
         }
