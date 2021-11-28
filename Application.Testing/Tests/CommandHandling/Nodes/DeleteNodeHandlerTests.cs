@@ -50,7 +50,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         public async Task Should_ReturnFailure_When_CommandNodeIdIsDefault( )
         {
             // Given
-            var id = GivenIdOfNodeIdInRepository( );
+            GivenIdOfNodeIdInRepository( );
             var command = new DeleteNode.Command
             {
                 NodeId = default

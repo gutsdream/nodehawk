@@ -1,3 +1,4 @@
+using Api.Extensions;
 using Application.Interfaces;
 using Application.QueryHandling.Nodes;
 using Hangfire;
@@ -41,9 +42,7 @@ namespace Api
                 c.SwaggerDoc( "v1", new OpenApiInfo { Title = "Api", Version = "v1" } );
                 c.CustomSchemaIds( type => type.ToString( ) );
             } );
-
-            services.AddDbContext<DataContext>( opt => { opt.UseSqlite( Configuration.GetConnectionString( "DefaultConnection" ) ); } );
-
+            
             services.AddCors( x => x.AddPolicy( CorsPolicyName, policy =>
             {
                 policy.AllowAnyMethod( )
@@ -51,20 +50,7 @@ namespace Api
                     .WithOrigins( "http://localhost:3000" );
             } ) );
 
-            services.AddDataProtection( );
-
-            services.AddScoped<IRepository, Repository>( );
-            services.AddSingleton<ICypherService, CypherService>( );
-            // services.AddScoped<SshClient, SshClient>( );
-            services.AddScoped<INodeHawkSshClient, NodeHawkNodeHawkSshClient>( );
-
-            services.AddMediatR( typeof( NodeListQueryHandler ).Assembly );
-
-            services.AddHangfire( x => { x.UseMemoryStorage( ); } );
-            services.AddHangfireServer( );
-            services.AddScoped<SnapshotJobManager, SnapshotJobManager>( );
-            services.AddScoped<IBackgroundTaskManager, BackgroundTaskManager>( );
-
+            services.AddApplicationServices( Configuration );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -72,7 +58,7 @@ namespace Api
             IWebHostEnvironment env,
             IRecurringJobManager recurringJobManager,
             IBackgroundJobClient backgroundJobManager,
-            SnapshotJobManager snapshotJobManager )
+            NodeHawkScheduledJobs nodeHawkScheduledJobs )
         {
             if ( env.IsDevelopment( ) )
             {
@@ -80,8 +66,6 @@ namespace Api
                 app.UseSwagger( );
                 app.UseSwaggerUI( c => c.SwaggerEndpoint( "/swagger/v1/swagger.json", "Api v1" ) );
             }
-
-            // app.UseHttpsRedirection( );
 
             app.UseRouting( );
 
@@ -91,10 +75,7 @@ namespace Api
 
             app.UseEndpoints( endpoints => { endpoints.MapControllers( ); } );
 
-            backgroundJobManager.Enqueue( ( ) => snapshotJobManager.SnapshotAll( ) );
-            recurringJobManager.AddOrUpdate( "Snapshot Generation: 15 Minute Interval", 
-                ( ) => snapshotJobManager.SnapshotAll(  ), 
-                "*/15 * * * *" );
+            JobRegistration.Initialize( recurringJobManager, backgroundJobManager, nodeHawkScheduledJobs );
         }
     }
 }
