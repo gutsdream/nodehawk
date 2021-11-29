@@ -2,6 +2,7 @@ using System;
 using Application.Constants;
 using Application.Extensions;
 using Application.Interfaces;
+using Application.Models.JobActivities;
 using Application.Models.Requests;
 using Domain.Entities;
 using FluentValidation;
@@ -28,7 +29,7 @@ namespace Application.CommandHandling.Nodes.Snapshots
 
     public class CreateNodeSnapshotHandler : ValidatableCommandHandler<CreateNodeSnapshot.Command, CreateNodeSnapshot.Command.Validator>
     {
-        public CreateNodeSnapshotHandler( IRepository repository, INodeHawkSshClient nodeHawkSshClient )
+        public CreateNodeSnapshotHandler( IRepository repository, INodeHawkSshClient nodeHawkSshClient, JobActivityManager jobActivityManager )
         {
             Validate( async x =>
             {
@@ -49,31 +50,44 @@ namespace Application.CommandHandling.Nodes.Snapshots
                     .Include( n => n.Snapshots )
                     .FirstAsync( n => n.Id == x.NodeId );
 
-                nodeHawkSshClient.ConnectToNode( node );
-                
-                int spaceUsed = GetSpaceUsed( nodeHawkSshClient );
-                bool containerRunning = IsContainerRunning( nodeHawkSshClient );
+                var activity = new CreateNodeSnapshotActivity( node );
+                jobActivityManager.RegisterActivity( activity );
+
+                ConnectToNode( nodeHawkSshClient, activity, node );
+
+                int spaceUsed = GetSpaceUsed( nodeHawkSshClient, activity );
+                bool containerRunning = IsContainerRunning( nodeHawkSshClient, activity );
 
                 node.CreateSnapshot( spaceUsed, containerRunning );
+                jobActivityManager.CompleteActivity( activity );
 
-                //TODO: use a command post processor, remove Save from IRepository interface 
                 await repository.SaveAsync( );
             } );
         }
 
-        private static bool IsContainerRunning( INodeHawkSshClient nodeHawkSshClient )
+        private static void ConnectToNode( INodeHawkSshClient nodeHawkSshClient, CreateNodeSnapshotActivity activity, Node node )
         {
-            var containerRunningResult = nodeHawkSshClient.Run( SshCommands.IsContainerRunning );
-            var containerRunning = containerRunningResult.Content.Contains( "true" );
-            return containerRunning;
+            activity.ConnectingToNode( );
+            nodeHawkSshClient.ConnectToNode( node );
         }
 
-        private static int GetSpaceUsed( INodeHawkSshClient nodeHawkSshClient )
+        private static int GetSpaceUsed( INodeHawkSshClient nodeHawkSshClient, CreateNodeSnapshotActivity activity )
         {
-            var dfCommandResult = nodeHawkSshClient.Run( SshCommands.GetDiskSpace );
+            activity.CheckingSpaceUsed( );
+
+            var dfCommandResult = nodeHawkSshClient.Run( Ssh.Queries.GetDiskSpace );
             var spaceUsed = GetSpaceUsedPercentageFromSshResult( dfCommandResult );
-            
+
             return spaceUsed;
+        }
+        
+        private static bool IsContainerRunning( INodeHawkSshClient nodeHawkSshClient, CreateNodeSnapshotActivity activity )
+        {
+            activity.CheckingIfNodeOnline( );
+
+            var containerRunningResult = nodeHawkSshClient.Run( Ssh.Queries.IsContainerRunning );
+            var containerRunning = containerRunningResult.Content.Contains( "true" );
+            return containerRunning;
         }
 
         /// <summary>

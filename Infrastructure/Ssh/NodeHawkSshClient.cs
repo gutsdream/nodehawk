@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Application.Constants;
 using Application.Interfaces;
 using Domain.Entities;
@@ -22,20 +24,33 @@ namespace Infrastructure.Ssh
             var hostname = _cypherService.Decrypt( details.Host );
             var username = _cypherService.Decrypt( details.Username );
             var key = _cypherService.Decrypt( details.Key );
-            
+
             // TODO: use a factory here rather than newing one up
             _sshClient = new SshClient( hostname, username, key );
-            _sshClient.Connect();
+            _sshClient.Connect( );
         }
 
-        public ISshCommandResult Run( SshCommands.Command nodeHawkSshCommand )
+        public ISshCommandResult Run( Application.Constants.Ssh.Message nodeHawkSshMessage )
         {
             if ( !_sshClient.IsConnected )
             {
-                throw new InvalidOperationException( $"Must run {nameof( ConnectToNode )} before running commands" );
+                throw new InvalidOperationException( $"Must run {nameof( ConnectToNode )} before sending SSH Messages" );
             }
-            var command = _sshClient.RunCommand( nodeHawkSshCommand.Value );
+
+            var command = _sshClient.RunCommand( nodeHawkSshMessage.Value );
             return new SshCommandResult( command );
+        }
+
+        public ISshCommandResult Run( List<Application.Constants.Ssh.Message> nodeHawkSshMessages )
+        {
+            var commands = new List<SshCommand>( );
+            foreach ( var message in nodeHawkSshMessages )
+            {
+                commands.Add( _sshClient.RunCommand( message.Value ) );
+            }
+
+            // We usually only really care about the final command, the others are usually just preconditions
+            return new SshCommandResult( commands.Last( ) );
         }
 
         public void Dispose( )

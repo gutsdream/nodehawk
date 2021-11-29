@@ -51,5 +51,11 @@ namespace Api.Controllers
         {
             return Evaluate( await Mediator.Send( createNodeSnapshotCommand ) );
         }
+        
+        [HttpPost]
+        public async Task<IActionResult> CleanNode( CleanNode.Command cleanNodeCommand )
+        {
+            return Evaluate( await Mediator.Send( cleanNodeCommand ) );
+        }
     }
 }

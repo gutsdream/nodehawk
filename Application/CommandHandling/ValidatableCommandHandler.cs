@@ -2,14 +2,13 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.CommandHandling;
 using Application.Models.Requests;
 using Domain.ExceptionHandling;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 
-namespace Application
+namespace Application.CommandHandling
 {
     /// <summary>
     /// Abstract base class for handling <see cref="ValidatableCommand{TCommand,TValidator}"/>.<br/><br/>

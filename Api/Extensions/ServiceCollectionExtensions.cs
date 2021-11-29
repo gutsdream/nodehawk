@@ -1,3 +1,4 @@
+using Application.CommandHandling;
 using Application.Interfaces;
 using Application.QueryHandling.Nodes;
 using Hangfire;
@@ -33,6 +34,8 @@ namespace Api.Extensions
             
             services.AddScoped<NodeHawkScheduledJobs, NodeHawkScheduledJobs>( );
             services.AddScoped<IBackgroundTaskManager, BackgroundTaskManager>( );
+
+            services.AddSingleton<JobActivityManager, JobActivityManager>( );
         }
     }
 }
