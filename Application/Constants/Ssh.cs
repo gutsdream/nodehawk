@@ -29,6 +29,16 @@ namespace Application.Constants
                     new("journalctl --vacuum-time=1h")
                 };
             }
+
+            public static class Aws
+            {
+                public static Message RunBackupScript( string accessKey, string secretKey, string bucketName )
+                {
+                    return new Message($"docker exec otnode node scripts/backup-upload-aws.js --config=/ot-node/.origintrail_noderc " +
+                                       $"--configDir=/ot-node/data --backupDirectory=/ot-node/backup " +
+                                       $"--AWSAccessKeyId={accessKey} --AWSSecretAccessKey={secretKey} --AWSBucketName={bucketName}");
+                }
+            }
         }
 
         public class Message

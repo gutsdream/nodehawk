@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Application.Constants;
 using Application.Interfaces;
 using Domain.Entities;
 using Renci.SshNet;
@@ -32,7 +31,7 @@ namespace Infrastructure.Ssh
 
         public ISshCommandResult Run( Application.Constants.Ssh.Message nodeHawkSshMessage )
         {
-            if ( !_sshClient.IsConnected )
+            if ( _sshClient == null || !_sshClient.IsConnected )
             {
                 throw new InvalidOperationException( $"Must run {nameof( ConnectToNode )} before sending SSH Messages" );
             }

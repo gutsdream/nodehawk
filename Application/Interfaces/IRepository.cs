@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces
 {
+    // TODO: this is fucking retarded and achieves nothing, remove
     public interface IRepository
     {
         void Add<TEntity>( TEntity entity ) where TEntity : class;

@@ -1,9 +1,4 @@
-using System;
-using System.Threading.Tasks;
-using Application.CommandHandling.Nodes;
-using Application.CommandHandling.Nodes.Snapshots;
 using Hangfire;
-using MediatR;
 using Scheduler.SnapshotScheduler;
 
 namespace Scheduler
@@ -23,6 +18,8 @@ namespace Scheduler
             recurringJobManager.AddOrUpdate( "Node Snapshot Cleanup: Daily",
                 ( ) => nodeHawkScheduledJobs.CleanOldSnapshots( ),
                 Cron.Daily );
+            
+            // TODO: allow user to automate their shit here (backup/ clean node weekly)
         }
     }
 }

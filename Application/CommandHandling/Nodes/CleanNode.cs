@@ -1,7 +1,5 @@
 using System;
-using System.Linq;
-using System.Runtime.Intrinsics.X86;
-using Application.CommandHandling.Nodes.Snapshots;
+using Application.CommandHandling.Snapshots;
 using Application.Constants;
 using Application.Extensions;
 using Application.Interfaces;
@@ -23,7 +21,7 @@ namespace Application.CommandHandling.Nodes
             {
                 public Validator( )
                 {
-                    RuleFor( x => x.NodeId ).NotEqual( ( Guid ) default );
+                    RuleFor( x => x.NodeId ).NotEmpty( );
                 }
             }
         }
@@ -73,16 +71,10 @@ namespace Application.CommandHandling.Nodes
             } );
         }
 
-        private static void CleanCacheAndJournals( INodeHawkSshClient sshClient, CleanNodeActivity cleanNodeActivity )
+        private static void ConnectToNode( INodeHawkSshClient sshClient, CleanNodeActivity cleanNodeActivity, Node node )
         {
-            cleanNodeActivity.CleaningCacheAndJournals( );
-            sshClient.Run( Ssh.Commands.SpaceManagement.CleanCacheAndJournals );
-        }
-
-        private static void DeleteDockerTextLogs( INodeHawkSshClient sshClient, CleanNodeActivity cleanNodeActivity )
-        {
-            cleanNodeActivity.DeletingDockerTextLogs( );
-            sshClient.Run( Ssh.Commands.SpaceManagement.DeleteAllDockerTextLogs );
+            cleanNodeActivity.ConnectingToNode( );
+            sshClient.ConnectToNode( node );
         }
 
         private static void DeleteDockerOtNodeFile( INodeHawkSshClient sshClient, CleanNodeActivity cleanNodeActivity )
@@ -91,10 +83,16 @@ namespace Application.CommandHandling.Nodes
             sshClient.Run( Ssh.Commands.SpaceManagement.DeleteDockerOtNodeLogFile );
         }
 
-        private static void ConnectToNode( INodeHawkSshClient sshClient, CleanNodeActivity cleanNodeActivity, Node node )
+        private static void DeleteDockerTextLogs( INodeHawkSshClient sshClient, CleanNodeActivity cleanNodeActivity )
         {
-            cleanNodeActivity.ConnectingToNode( );
-            sshClient.ConnectToNode( node );
+            cleanNodeActivity.DeletingDockerTextLogs( );
+            sshClient.Run( Ssh.Commands.SpaceManagement.DeleteAllDockerTextLogs );
+        }
+
+        private static void CleanCacheAndJournals( INodeHawkSshClient sshClient, CleanNodeActivity cleanNodeActivity )
+        {
+            cleanNodeActivity.CleaningCacheAndJournals( );
+            sshClient.Run( Ssh.Commands.SpaceManagement.CleanCacheAndJournals );
         }
     }
 }

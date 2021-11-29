@@ -1,6 +1,6 @@
 using System;
 using Application.CommandHandling.Nodes.Interfaces;
-using Application.CommandHandling.Nodes.Snapshots;
+using Application.CommandHandling.Snapshots;
 using Application.Extensions;
 using Application.Interfaces;
 using Application.Models.Requests;

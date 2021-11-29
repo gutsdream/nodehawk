@@ -4,7 +4,7 @@ using Application.Interfaces;
 using Domain.Entities;
 using MediatR;
 
-namespace Application.CommandHandling.Nodes.Snapshots
+namespace Application.CommandHandling.Snapshots
 {
     public class SnapshotAll
     {

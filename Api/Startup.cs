@@ -1,20 +1,12 @@
 using Api.Extensions;
-using Application.Interfaces;
-using Application.QueryHandling.Nodes;
 using Hangfire;
-using Hangfire.MemoryStorage;
-using Infrastructure.Encryption;
-using Infrastructure.Ssh;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using Persistence;
 using Scheduler;
 using Scheduler.SnapshotScheduler;
 

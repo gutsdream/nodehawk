@@ -8,7 +8,7 @@ using Domain.Entities;
 using FluentValidation;
 using FluentValidation.Results;
 
-namespace Application.CommandHandling.Nodes.Snapshots
+namespace Application.CommandHandling.Snapshots
 {
     public class CreateNodeSnapshot
     {

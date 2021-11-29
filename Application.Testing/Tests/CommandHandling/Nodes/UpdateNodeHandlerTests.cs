@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Application.CommandHandling;
 using Application.CommandHandling.Nodes;
 using Application.CommandHandling.Nodes.Interfaces;
-using Application.CommandHandling.Nodes.Snapshots;
+using Application.CommandHandling.Snapshots;
 using Application.Testing.Mocks;
 using Domain.Entities;
 using Testing.Shared;

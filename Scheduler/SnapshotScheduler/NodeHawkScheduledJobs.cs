@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Application.CommandHandling.Nodes;
-using Application.CommandHandling.Nodes.Snapshots;
+using Application.CommandHandling.Snapshots;
 using MediatR;
 
 namespace Scheduler.SnapshotScheduler
