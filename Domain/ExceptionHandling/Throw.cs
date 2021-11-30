@@ -14,6 +14,14 @@ namespace Domain.ExceptionHandling
                 }
             }
 
+            public static void NullOrWhitespace( string value, string name )
+            {
+                if ( string.IsNullOrWhiteSpace( value ) )
+                {
+                    throw new ArgumentNullException( name );
+                }
+            }
+
             public static void InvalidLength( string value, string name, int expectedLength )
             {
                 if ( value == null || value.Length != expectedLength )

@@ -15,13 +15,13 @@ namespace Domain.Entities
 
         public void UpdateSecretKey( string secretKey )
         {
-            Throw.If.Null( secretKey, nameof( secretKey ) );
+            Throw.If.NullOrWhitespace( secretKey, nameof( secretKey ) );
             SecretKey = secretKey;
         }
 
         public void UpdateAccessKey( string accessKey )
         {
-            Throw.If.Null( accessKey, nameof( accessKey ) );
+            Throw.If.NullOrWhitespace( accessKey, nameof( accessKey ) );
             AccessKey = accessKey;
         }
     }
