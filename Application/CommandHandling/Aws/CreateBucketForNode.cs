@@ -1,8 +1,6 @@
 using System;
 using System.Linq;
 using System.Threading;
-using Amazon.Runtime;
-using Amazon.S3;
 using Application.CommandHandling.Aws.Helpers;
 using Application.Extensions;
 using Application.Interfaces;
@@ -11,6 +9,8 @@ using Application.Models.Requests;
 using Domain.Entities;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 
 namespace Application.CommandHandling.Aws
 {
@@ -32,20 +32,21 @@ namespace Application.CommandHandling.Aws
 
     public class CreateBucketForNodeHandler : ValidatableCommandHandler<CreateBucketForNode.Command, CreateBucketForNode.Command.Validator>
     {
-        public CreateBucketForNodeHandler( IRepository repository, ICypherService cypherService, JobActivityManager jobActivityManager )
+        public CreateBucketForNodeHandler( DataContext repository, ICypherService cypherService, JobActivityManager jobActivityManager )
         {
             Validate( async x =>
             {
+                // TODO: not sure if the job acticvity manager is working here for whatever reason?
                 var result = new ValidationResult( );
 
-                var node = await repository.Get<Node>( ).FirstOrDefaultAsync( n => n.Id == x.NodeId );
+                var node = await repository.Nodes.FirstOrDefaultAsync( n => n.Id == x.NodeId );
 
                 if ( node == default )
                 {
                     result.AddError( nameof( x.NodeId ), $"Node with {nameof( Node.Id )} '{x.NodeId}' does not exist." );
                 }
 
-                var awsDetails = await repository.Get<AwsDetails>( ).FirstOrDefaultAsync( );
+                var awsDetails = await repository.AwsDetails.FirstOrDefaultAsync( );
                 if ( awsDetails == default )
                 {
                     result.AddError( nameof( AwsDetails ), $"AWS Details not found." );
@@ -63,12 +64,12 @@ namespace Application.CommandHandling.Aws
 
             OnSuccessfulValidation( async x =>
             {
-                var node = await repository.Get<Node>( ).FirstAsync( n => n.Id == x.NodeId );
+                var node = await repository.Nodes.FirstAsync( n => n.Id == x.NodeId );
 
                 var bucketCreationActivity = new BucketCreationActivity( node );
                 jobActivityManager.RegisterActivity( bucketCreationActivity );
 
-                var awsDetails = await repository.Get<AwsDetails>( ).FirstAsync( );
+                var awsDetails = await repository.AwsDetails.FirstAsync( );
                 var client = AwsClientFactory.GetS3ClientFromAwsDetails( cypherService, awsDetails );
 
                 bucketCreationActivity.CreatingBucket( );

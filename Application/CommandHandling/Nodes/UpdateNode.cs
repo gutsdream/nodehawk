@@ -8,6 +8,8 @@ using Application.Validators.Nodes;
 using Domain.Entities;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 
 namespace Application.CommandHandling.Nodes
 {
@@ -36,23 +38,23 @@ namespace Application.CommandHandling.Nodes
 
     public class UpdateNodeHandler : ValidatableCommandHandler<UpdateNode.Command, UpdateNode.Command.Validator>
     {
-        public UpdateNodeHandler( IRepository repository, ICypherService cypherService, IBackgroundTaskManager backgroundTaskManager )
+        public UpdateNodeHandler( DataContext repository, ICypherService cypherService, IBackgroundTaskManager backgroundTaskManager )
         {
             Validate( async x =>
             {
                 var result = new ValidationResult( );
 
-                if ( !await repository.Exists<Node>( n => n.Id == x.NodeId ) )
+                if ( !await repository.Nodes.AnyAsync( n => n.Id == x.NodeId ) )
                 {
                     result.AddError( nameof( x.NodeId ), $"A node with {nameof( Node.Id )} '{x.NodeId}' was not found." );
                 }
 
-                if ( await repository.Exists<Node>( n => n.Title == x.Title && n.Id != x.NodeId ) )
+                if ( await repository.Nodes.AnyAsync( n => n.Title == x.Title && n.Id != x.NodeId ) )
                 {
                     result.AddError( nameof( x.Title ), $"Different node with {nameof( Node.Title )} '{x.Title}' already exists." );
                 }
 
-                if ( x.ExternalId != null && await repository.Exists<Node>( n => n.ExternalId == x.ExternalId && n.Id != x.NodeId ) )
+                if ( x.ExternalId != null && await repository.Nodes.AnyAsync( n => n.ExternalId == x.ExternalId && n.Id != x.NodeId ) )
                 {
                     result.AddError( nameof( x.ExternalId ), $"Different node with {nameof( Node.ExternalId )} '{x.ExternalId}' already exists." );
                 }
@@ -62,7 +64,7 @@ namespace Application.CommandHandling.Nodes
 
             OnSuccessfulValidation( async x =>
             {
-                var node = await repository.Get<Node>( ).FirstOrDefaultAsync( n => n.Id == x.NodeId );
+                var node = await repository.Nodes.FirstOrDefaultAsync( n => n.Id == x.NodeId );
 
                 var connectionDetails = new ConnectionDetails( cypherService.Encrypt( x.Host ),
                     cypherService.Encrypt( x.Username ),
@@ -72,7 +74,7 @@ namespace Application.CommandHandling.Nodes
                 node.SetTitle( x.Title );
                 node.SetExternalId( x.ExternalId );
 
-                await repository.SaveAsync( );
+                await repository.SaveChangesAsync( );
 
                 backgroundTaskManager.QueueRequest<CreateNodeSnapshot.Command, ICommandResult>( new CreateNodeSnapshot.Command { NodeId = node.Id } );
             } );

@@ -13,6 +13,7 @@ namespace Application.CommandHandling.Aws.Helpers
             var credentials = new BasicAWSCredentials( cypherService.Decrypt( awsDetails.AccessKey ),
                 cypherService.Decrypt( awsDetails.SecretKey ) );
 
+            // TODO: Maybe add a preferred region to AWS Details that can pop thru here
             return new AmazonS3Client( credentials, RegionEndpoint.USWest1 );
         }
     }

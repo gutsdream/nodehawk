@@ -23,7 +23,6 @@ namespace Api.Extensions
 
             services.AddDataProtection( );
 
-            services.AddScoped<IRepository, Repository>( );
             services.AddSingleton<ICypherService, CypherService>( );
             services.AddScoped<INodeHawkSshClient, NodeHawkNodeHawkSshClient>( );
 

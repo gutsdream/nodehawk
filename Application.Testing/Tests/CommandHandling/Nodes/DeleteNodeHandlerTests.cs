@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.CommandHandling.Nodes;
-using Application.Testing.Mocks;
-using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 using Testing.Shared;
 using Xunit;
 
@@ -12,27 +11,19 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
 {
     public class DeleteNodeHandlerTests
     {
-        private readonly DeleteNodeHandler _deleteNodeHandler;
-
-        private readonly List<Node> _nodes;
-
-        private readonly RepositoryMock _repositoryMock;
+        private DeleteNodeHandler _deleteNodeHandler;
+        private DataContext _context;
 
         public DeleteNodeHandlerTests( )
         {
-            _nodes = new List<Node>( );
-
-            _repositoryMock = new RepositoryMock( );
-            _repositoryMock.WithEntitiesFor( ( ) => _nodes );
-
-            _deleteNodeHandler = new DeleteNodeHandler( _repositoryMock.Object );
+            GivenFreshHandler( );
         }
 
         [Fact]
         public async Task Should_ReturnSuccess_When_CommandIsValid_And_NodeIdMatchesExistingNode( )
         {
             // Given
-            var id = GivenIdOfNodeIdInRepository( );
+            var id = await GivenIdOfNodeIdInRepository( );
             var command = new DeleteNode.Command
             {
                 NodeId = id
@@ -43,14 +34,14 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
 
             // Then
             Assert.True( result.IsSuccessful );
-            Assert.True( _repositoryMock.DoesNotContain<Node>( x => x.Id == id ) );
+            Assert.True( !await _context.Nodes.AnyAsync( x => x.Id == id ) );
         }
 
         [Fact]
         public async Task Should_ReturnFailure_When_CommandNodeIdIsDefault( )
         {
             // Given
-            GivenIdOfNodeIdInRepository( );
+            await GivenIdOfNodeIdInRepository( );
             var command = new DeleteNode.Command
             {
                 NodeId = default
@@ -82,12 +73,19 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             Then.ResultContainsError( result, nameof( command.NodeId ), $"A node with {nameof( command.NodeId )} '{id}' was not found." );
         }
 
-        private Guid GivenIdOfNodeIdInRepository( )
+        private async Task<Guid> GivenIdOfNodeIdInRepository( )
         {
             var node = TestData.Create.Node( );
-            _nodes.Add( node );
+            _context.Nodes.Add( node );
+            await _context.SaveChangesAsync( );
 
             return node.Id;
+        }
+        
+        private void GivenFreshHandler( )
+        {
+            _context = TestData.Create.UniqueContext( );
+            _deleteNodeHandler = new DeleteNodeHandler( _context );
         }
     }
 }

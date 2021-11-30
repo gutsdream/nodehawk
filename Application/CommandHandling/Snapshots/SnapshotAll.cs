@@ -1,8 +1,9 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Interfaces;
 using Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 
 namespace Application.CommandHandling.Snapshots
 {
@@ -16,16 +17,16 @@ namespace Application.CommandHandling.Snapshots
     public class SnapshotAllCommandHandler :IRequestHandler<SnapshotAll.Command>
     {
         private readonly IMediator _mediator;
-        private readonly IRepository _repository;
+        private readonly DataContext _repository;
 
-        public SnapshotAllCommandHandler( IMediator mediator, IRepository repository )
+        public SnapshotAllCommandHandler( IMediator mediator, DataContext repository )
         {
             _mediator = mediator;
             _repository = repository;
         }
         public async Task<Unit> Handle( SnapshotAll.Command request, CancellationToken cancellationToken )
         {
-            var nodes = await _repository.Get<Node>( ).ToListAsync( );
+            var nodes = await _repository.Nodes.ToListAsync( );
             nodes.ForEach( SnapshotNode );
             
             return Unit.Value;

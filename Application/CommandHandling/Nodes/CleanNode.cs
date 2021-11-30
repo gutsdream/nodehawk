@@ -8,6 +8,8 @@ using Application.Models.Requests;
 using Domain.Entities;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 
 namespace Application.CommandHandling.Nodes
 {
@@ -30,7 +32,7 @@ namespace Application.CommandHandling.Nodes
     // TODO: Validator should be a part of the command, why do we need to specify the validator here? seems redundant 
     public class CleanNodeCommandHandler : ValidatableCommandHandler<CleanNode.Command, CleanNode.Command.Validator>
     {
-        public CleanNodeCommandHandler( IRepository repository,
+        public CleanNodeCommandHandler( DataContext repository,
             INodeHawkSshClient sshClient,
             JobActivityManager jobActivityManager,
             IBackgroundTaskManager backgroundTaskManager )
@@ -39,7 +41,7 @@ namespace Application.CommandHandling.Nodes
             {
                 var result = new ValidationResult( );
 
-                if ( !await repository.Exists<Node>( n => n.Id == x.NodeId ) )
+                if ( !await repository.Nodes.AnyAsync( n => n.Id == x.NodeId ) )
                 {
                     result.AddError( nameof( x.NodeId ), $"A node with {nameof( x.NodeId )} '{x.NodeId}' was not found." );
                 }
@@ -50,7 +52,8 @@ namespace Application.CommandHandling.Nodes
             // Thank u otnode.com <3
             OnSuccessfulValidation( async x =>
             {
-                var node = await repository.Get<Node>( )
+                // TODO: refactor this and other shared command based queries into somewhere
+                var node = await repository.Nodes
                     .Include( n => n.ConnectionDetails )
                     .FirstAsync( n => n.Id == x.NodeId );
 

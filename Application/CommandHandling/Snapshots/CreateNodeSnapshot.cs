@@ -7,6 +7,8 @@ using Application.Models.Requests;
 using Domain.Entities;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 
 namespace Application.CommandHandling.Snapshots
 {
@@ -29,13 +31,13 @@ namespace Application.CommandHandling.Snapshots
 
     public class CreateNodeSnapshotHandler : ValidatableCommandHandler<CreateNodeSnapshot.Command, CreateNodeSnapshot.Command.Validator>
     {
-        public CreateNodeSnapshotHandler( IRepository repository, INodeHawkSshClient nodeHawkSshClient, JobActivityManager jobActivityManager )
+        public CreateNodeSnapshotHandler( DataContext repository, INodeHawkSshClient nodeHawkSshClient, JobActivityManager jobActivityManager )
         {
             Validate( async x =>
             {
                 var result = new ValidationResult( );
 
-                if ( !await repository.Exists<Node>( n => n.Id == x.NodeId ) )
+                if ( !await repository.Nodes.AnyAsync( n => n.Id == x.NodeId ) )
                 {
                     result.AddError( nameof( x.NodeId ), $"A node with {nameof( x.NodeId )} '{x.NodeId}' was not found." );
                 }
@@ -45,7 +47,7 @@ namespace Application.CommandHandling.Snapshots
 
             OnSuccessfulValidation( async x =>
             {
-                var node = await repository.Get<Node>( )
+                var node = await repository.Nodes
                     .Include( n => n.ConnectionDetails )
                     .Include( n => n.Snapshots )
                     .FirstAsync( n => n.Id == x.NodeId );
@@ -61,7 +63,7 @@ namespace Application.CommandHandling.Snapshots
                 node.CreateSnapshot( spaceUsed, containerRunning );
                 jobActivityManager.CompleteActivity( activity );
 
-                await repository.SaveAsync( );
+                await repository.SaveChangesAsync( );
             } );
         }
 

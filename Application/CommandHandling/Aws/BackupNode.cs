@@ -13,6 +13,8 @@ using Domain.Entities;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 
 namespace Application.CommandHandling.Aws
 {
@@ -34,7 +36,7 @@ namespace Application.CommandHandling.Aws
 
     public class BackupNodeHandler : ValidatableCommandHandler<BackupNode.Command, BackupNode.Command.Validator>
     {
-        public BackupNodeHandler( IRepository repository,
+        public BackupNodeHandler( DataContext repository,
             ICypherService cypherService,
             JobActivityManager jobActivityManager,
             INodeHawkSshClient sshClient,
@@ -44,14 +46,14 @@ namespace Application.CommandHandling.Aws
             {
                 var result = new ValidationResult( );
 
-                var node = await repository.Get<Node>( ).FirstOrDefaultAsync( n => n.Id == x.NodeId );
+                var node = await repository.Nodes.FirstOrDefaultAsync( n => n.Id == x.NodeId );
 
                 if ( node == default )
                 {
                     result.AddError( nameof( x.NodeId ), $"Node with {nameof( Node.Id )} '{x.NodeId}' does not exist." );
                 }
 
-                var awsDetails = await repository.Get<AwsDetails>( ).FirstOrDefaultAsync( );
+                var awsDetails = await repository.Nodes.FirstOrDefaultAsync( );
                 if ( awsDetails == default )
                 {
                     result.AddError( nameof( AwsDetails ), $"AWS Details not found." );
@@ -62,11 +64,11 @@ namespace Application.CommandHandling.Aws
 
             OnSuccessfulValidation( async x =>
             {
-                var node = await repository.Get<Node>( )
+                var node = await repository.Nodes
                     .Include( n => n.ConnectionDetails )
                     .FirstAsync( n => n.Id == x.NodeId );
 
-                var awsDetails = await repository.Get<AwsDetails>( ).FirstOrDefaultAsync( );
+                var awsDetails = await repository.AwsDetails.FirstOrDefaultAsync( );
 
                 var nodeBackupActivity = new BackupNodeActivity( node );
                 jobActivityManager.RegisterActivity( nodeBackupActivity );

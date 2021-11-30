@@ -6,6 +6,8 @@ using Application.Models.Requests;
 using Application.Validators.Nodes;
 using Domain.Entities;
 using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 
 namespace Application.CommandHandling.Nodes
 {
@@ -24,18 +26,18 @@ namespace Application.CommandHandling.Nodes
 
     public class CreateNodeHandler : ValidatableCommandHandler<CreateNode.Command, MutateNodeValidator<CreateNode.Command>>
     {
-        public CreateNodeHandler( IRepository repository, ICypherService cypherService, IBackgroundTaskManager backgroundTaskManager )
+        public CreateNodeHandler( DataContext repository, ICypherService cypherService, IBackgroundTaskManager backgroundTaskManager )
         {
             Validate( async x =>
             {
                 var result = new ValidationResult( );
 
-                if ( await repository.Exists<Node>( n => n.Title == x.Title ) )
+                if ( await repository.Nodes.AnyAsync( n => n.Title == x.Title ) )
                 {
                     result.AddError( nameof( x.Title ), $"Node with {nameof( Node.Title )} '{x.Title}' already exists." );
                 }
 
-                if ( x.ExternalId != null && await repository.Exists<Node>( n => n.ExternalId == x.ExternalId ) )
+                if ( x.ExternalId != null && await repository.Nodes.AnyAsync( n => n.ExternalId == x.ExternalId ) )
                 {
                     result.AddError( nameof( x.ExternalId ), $"Node with {nameof( Node.ExternalId )} '{x.ExternalId}' already exists." );
                 }
@@ -53,7 +55,7 @@ namespace Application.CommandHandling.Nodes
                 repository.Add( node );
                 
                 //TODO: use a command post processor, remove Save from IRepository interface 
-                await repository.SaveAsync( );
+                await repository.SaveChangesAsync( );
                 
                 // TODO: Move into SaveAsync eventhandler thing
                 backgroundTaskManager.QueueRequest<CreateNodeSnapshot.Command, ICommandResult>( new CreateNodeSnapshot.Command{ NodeId = node.Id } );

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.CommandHandling;
@@ -8,6 +7,7 @@ using Application.CommandHandling.Nodes.Interfaces;
 using Application.CommandHandling.Snapshots;
 using Application.Testing.Mocks;
 using Domain.Entities;
+using Persistence;
 using Testing.Shared;
 using Xunit;
 
@@ -15,34 +15,27 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
 {
     public class UpdateNodeHandlerTests
     {
-        private readonly UpdateNodeHandler _updateNodeHandler;
-
-        private readonly List<Node> _nodes;
+        private UpdateNodeHandler _updateNodeHandler;
 
         private readonly BackgroundTaskManagerMock _backgroundTaskManagerMock;
+        private DataContext _context;
 
         public UpdateNodeHandlerTests( )
         {
-            _nodes = new List<Node>( );
-
-            var repositoryMock = new RepositoryMock( );
-            repositoryMock.WithEntitiesFor( ( ) => _nodes );
-
             _backgroundTaskManagerMock = new BackgroundTaskManagerMock( );
             _backgroundTaskManagerMock.ConfigureQueue<CreateNodeSnapshot.Command, ICommandResult>( );
 
-            var cypherServiceMock = new CypherServiceMock( );
-
-            _updateNodeHandler = new UpdateNodeHandler( repositoryMock.Object,
-                cypherServiceMock.Object,
-                _backgroundTaskManagerMock.Object );
         }
+
+        
 
         [Fact]
         public async Task Should_ReturnSuccess_When_CommandIsValid_And_NoExistingNodeMatchesTitleOrExternalId( )
         {
             // Given
-            var guid = GivenIdOfNodeIdInRepository( );
+            GivenFreshHandler( );
+            
+            var guid = await GivenIdOfNodeIdInRepository( );
             const string title = "Node One";
             var command = new UpdateNode.Command
             {
@@ -66,6 +59,8 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         public async Task Should_ReturnFailure_When_CommandNodeIdIsDefault( )
         {
             // Given
+            GivenFreshHandler( );
+            
             var command = new UpdateNode.Command
             {
                 NodeId = default,
@@ -90,7 +85,9 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         public async Task Should_ReturnFailure_When_CommandTitleIsNullOrEmpty( string title )
         {
             // Given
-            var guid = GivenIdOfNodeIdInRepository( );
+            GivenFreshHandler( );
+            
+            var guid = await GivenIdOfNodeIdInRepository( );
             var command = new UpdateNode.Command
             {
                 NodeId = guid,
@@ -113,7 +110,9 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         public async Task Should_ReturnSuccess_When_CommandExternalIdIsNull( )
         {
             // Given
-            var guid = GivenIdOfNodeIdInRepository( );
+            GivenFreshHandler( );
+            
+            var guid = await GivenIdOfNodeIdInRepository( );
             var command = new UpdateNode.Command
             {
                 NodeId = guid,
@@ -135,7 +134,9 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         public async Task Should_ReturnSuccess_When_CommandExternalIdIs40Characters( )
         {
             // Given
-            var guid = GivenIdOfNodeIdInRepository( );
+            GivenFreshHandler( );
+            
+            var guid = await GivenIdOfNodeIdInRepository( );
             var externalId = new string( 'a', 40 );
             var command = new UpdateNode.Command
             {
@@ -161,7 +162,9 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         public async Task Should_ReturnFailure_When_CommandExternalIdIsLessThanOrGreaterThan40Characters( int characterLength )
         {
             // Given
-            var guid = GivenIdOfNodeIdInRepository( );
+            GivenFreshHandler( );
+            
+            var guid = await GivenIdOfNodeIdInRepository( );
             var externalId = new string( 'a', characterLength );
             var command = new UpdateNode.Command
             {
@@ -189,7 +192,9 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         public async Task Should_ReturnFailure_WhenCommandHostIsNullOrEmpty( string host )
         {
             // Given
-            var guid = GivenIdOfNodeIdInRepository( );
+            GivenFreshHandler( );
+            
+            var guid = await GivenIdOfNodeIdInRepository( );
             var command = new UpdateNode.Command
             {
                 NodeId = guid,
@@ -214,7 +219,9 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         public async Task Should_ReturnFailure_WhenCommandUsernameIsNullOrEmpty( string username )
         {
             // Given
-            var guid = GivenIdOfNodeIdInRepository( );
+            GivenFreshHandler( );
+            
+            var guid = await GivenIdOfNodeIdInRepository( );
             var command = new UpdateNode.Command
             {
                 NodeId = guid,
@@ -239,7 +246,9 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         public async Task Should_ReturnFailure_WhenCommandKeyIsNullOrEmpty( string key )
         {
             // Given
-            var guid = GivenIdOfNodeIdInRepository( );
+            GivenFreshHandler( );
+            
+            var guid = await GivenIdOfNodeIdInRepository( );
             var command = new UpdateNode.Command
             {
                 NodeId = guid,
@@ -262,7 +271,9 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         public async Task Should_ReturnFailure_When_NodeIdDoesNotMatchExistingNode( )
         {
             // Given
+            GivenFreshHandler( );
             GivenIdOfNodeIdInRepository( );
+            
             var guid = Guid.NewGuid( );
             var command = new UpdateNode.Command
             {
@@ -274,7 +285,8 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
                 Key = "superSecretPassword"
             };
 
-            _nodes.Add( UpdateNodeFromCommand( command ) );
+            _context.Nodes.Add( UpdateNodeFromCommand( command ) );
+            await _context.SaveChangesAsync( );
 
             // When
             var result = await _updateNodeHandler.Handle( command, new CancellationToken( ) );
@@ -288,7 +300,9 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         public async Task Should_ReturnFailure_When_ExistingNodeMatchesTitle( )
         {
             // Given
-            var guid = GivenIdOfNodeIdInRepository( );
+            GivenFreshHandler( );
+            
+            var guid = await GivenIdOfNodeIdInRepository( );
             const string title = "Node One";
             var command = new UpdateNode.Command
             {
@@ -300,7 +314,8 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
                 Key = "superSecretPassword"
             };
 
-            _nodes.Add( UpdateNodeFromCommand( command ) );
+            _context.Nodes.Add( UpdateNodeFromCommand( command ) );
+            await _context.SaveChangesAsync( );
 
             // When
             var result = await _updateNodeHandler.Handle( command, new CancellationToken( ) );
@@ -314,7 +329,9 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         public async Task Should_ReturnFailure_When_ExistingNodeMatchesExternalId( )
         {
             // Given
-            var guid = GivenIdOfNodeIdInRepository( );
+            GivenFreshHandler( );
+            
+            var guid = await GivenIdOfNodeIdInRepository( );
             const string externalId = "7cda80c35418f07543fae216cad224ea46dd11eb";
             var command = new UpdateNode.Command
             {
@@ -326,7 +343,8 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
                 Key = "superSecretPassword"
             };
 
-            _nodes.Add( UpdateNodeFromCommand( command ) );
+            _context.Nodes.Add( UpdateNodeFromCommand( command ) );
+            await _context.SaveChangesAsync( );
 
             command.Title = "unique title";
 
@@ -343,12 +361,24 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             return new Node( command.Title, new ConnectionDetails( command.Host, command.Username, command.Key ), command.ExternalId );
         }
 
-        private Guid GivenIdOfNodeIdInRepository( )
+        private async Task<Guid> GivenIdOfNodeIdInRepository( )
         {
             var node = TestData.Create.Node( );
-            _nodes.Add( node );
+            _context.Nodes.Add( node );
+            await _context.SaveChangesAsync( );
             
             return node.Id;
+        }
+        
+        private void GivenFreshHandler( )
+        {
+            var cypherServiceMock = new CypherServiceMock( );
+
+            _context = TestData.Create.UniqueContext( );
+
+            _updateNodeHandler = new UpdateNodeHandler( _context,
+                cypherServiceMock.Object,
+                _backgroundTaskManagerMock.Object );
         }
     }
 }

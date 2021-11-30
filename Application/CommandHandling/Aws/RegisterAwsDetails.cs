@@ -1,10 +1,11 @@
-using System.Linq;
 using Application.Extensions;
 using Application.Interfaces;
 using Application.Models.Requests;
 using Domain.Entities;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 
 namespace Application.CommandHandling.Aws
 {
@@ -28,7 +29,7 @@ namespace Application.CommandHandling.Aws
 
     public class RegisterAwsDetailsHandler : ValidatableCommandHandler<RegisterAwsDetails.Command, RegisterAwsDetails.Command.Validator>
     {
-        public RegisterAwsDetailsHandler( IRepository repository, ICypherService cypherService )
+        public RegisterAwsDetailsHandler( DataContext repository, ICypherService cypherService )
         {
             Validate( async x =>
             {
@@ -36,8 +37,7 @@ namespace Application.CommandHandling.Aws
 
                 // Currently nodehawk is designed for single user operation (and single AWS acc operation, etc etc)
                 // This may change in the future and if so this rule may be removed
-                var existingDetails = await repository.Get<AwsDetails>( ).ToListAsync( );
-                if ( existingDetails.Any( ) )
+                if ( await repository.AwsDetails.AnyAsync( ) )
                 {
                     result.AddError( nameof( AwsDetails ), "Keys for AWS already exist." );
                 }
@@ -50,7 +50,7 @@ namespace Application.CommandHandling.Aws
                 var details = new AwsDetails( cypherService.Encrypt( x.AccessKey ), cypherService.Encrypt( x.SecretKey ) );
 
                 repository.Add( details );
-                await repository.SaveAsync( );
+                await repository.SaveChangesAsync( );
             } );
         }
     }

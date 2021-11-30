@@ -1,10 +1,11 @@
-using System.Linq;
 using Application.Extensions;
 using Application.Interfaces;
 using Application.Models.Requests;
 using Domain.Entities;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 
 namespace Application.CommandHandling.Aws
 {
@@ -28,14 +29,13 @@ namespace Application.CommandHandling.Aws
 
     public class UpdateAwsDetailsHandler : ValidatableCommandHandler<RegisterAwsDetails.Command, RegisterAwsDetails.Command.Validator>
     {
-        public UpdateAwsDetailsHandler( IRepository repository, ICypherService cypherService )
+        public UpdateAwsDetailsHandler( DataContext repository, ICypherService cypherService )
         {
             Validate( async x =>
             {
                 var result = new ValidationResult( );
 
-                var existingDetails = await repository.Get<AwsDetails>( ).ToListAsync( );
-                if ( !existingDetails.Any( ) )
+                if ( !await repository.AwsDetails.AnyAsync( ) )
                 {
                     result.AddError( nameof( AwsDetails ), "No AWS keys exist to update." );
                 }
@@ -45,13 +45,13 @@ namespace Application.CommandHandling.Aws
 
             OnSuccessfulValidation( async x =>
             {
-                var details = await repository.Get<AwsDetails>( ).FirstAsync( );
+                var details = await repository.AwsDetails.FirstAsync( );
                 
                 details.UpdateAccessKey( cypherService.Encrypt( x.AccessKey ) );
                 details.UpdateSecretKey( cypherService.Encrypt( x.SecretKey ) );
                 
                 repository.Add( details );
-                await repository.SaveAsync( );
+                await repository.SaveChangesAsync( );
             } );
         }
     }

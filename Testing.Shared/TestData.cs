@@ -1,5 +1,7 @@
 using System;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 
 namespace Testing.Shared
 {
@@ -15,6 +17,16 @@ namespace Testing.Shared
             public static ConnectionDetails ConnectionDetails( )
             {
                 return new ConnectionDetails( "host", "username", "key" ) { Id = Guid.NewGuid( ) };
+            }
+
+            //TODO: move
+            public static DataContext UniqueContext( )
+            {
+                var dbContextOptions = new DbContextOptionsBuilder<DataContext>( )
+                    .UseInMemoryDatabase( databaseName: Guid.NewGuid( ).ToString( ) )
+                    .Options;
+
+                return new DataContext( dbContextOptions );
             }
         }
     }

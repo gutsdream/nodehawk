@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Interfaces;
 using Application.Models.Dtos;
-using Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 
 namespace Application.QueryHandling.Nodes
 {
@@ -18,16 +18,16 @@ namespace Application.QueryHandling.Nodes
 
     public class NodeListQueryHandler : IRequestHandler<NodeList.Query, IQueryResult<List<NodeDto>>>
     {
-        private readonly IRepository _repository;
+        private readonly DataContext _repository;
 
-        public NodeListQueryHandler( IRepository repository )
+        public NodeListQueryHandler( DataContext repository )
         {
             _repository = repository;
         }
 
         public async Task<IQueryResult<List<NodeDto>>> Handle( NodeList.Query request, CancellationToken cancellationToken )
         {
-            var nodes = await _repository.Get<Node>( )
+            var nodes = await _repository.Nodes
                 .Include( x => x.Snapshots )
                 .ToListAsync( );
 

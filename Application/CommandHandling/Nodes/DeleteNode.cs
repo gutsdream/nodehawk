@@ -1,10 +1,10 @@
 using System;
 using Application.Extensions;
-using Application.Interfaces;
 using Application.Models.Requests;
-using Domain.Entities;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore;
+using Persistence;
 
 namespace Application.CommandHandling.Nodes
 {
@@ -27,13 +27,13 @@ namespace Application.CommandHandling.Nodes
 
     public class DeleteNodeHandler : ValidatableCommandHandler<DeleteNode.Command, DeleteNode.Command.Validator>
     {
-        public DeleteNodeHandler( IRepository repository )
+        public DeleteNodeHandler( DataContext repository )
         {
             Validate( async x =>
             {
                 var result = new ValidationResult( );
 
-                if ( !await repository.Exists<Node>( n => n.Id == x.NodeId ) )
+                if ( !await repository.Nodes.AnyAsync( n => n.Id == x.NodeId ) )
                 {
                     result.AddError( nameof( x.NodeId ), $"A node with {nameof( x.NodeId )} '{x.NodeId}' was not found." );
                 }
@@ -43,13 +43,13 @@ namespace Application.CommandHandling.Nodes
 
             OnSuccessfulValidation( async x =>
             {
-                var node = await repository.Get<Node>( )
+                var node = await repository.Nodes
                     .Include( n => n.ConnectionDetails )
                     .FirstAsync( n => n.Id == x.NodeId );
                 repository.Remove( node.ConnectionDetails );
                 repository.Remove( node );
 
-                await repository.SaveAsync( );
+                await repository.SaveChangesAsync( );
             } );
         }
     }
