@@ -1,11 +1,13 @@
 using Application.Core.Shared.Interfaces;
-using MediatR;
 
 namespace Application.Core.Interfaces
 {
     public interface IEventManager
     {
-        void PublishEvent( IApplicationEvent applicationEvent );
+        /// <summary>
+        /// Publishes an event in a fire and forget manner.
+        /// </summary>
+        void PublishEvent<TEvent>( TEvent applicationEvent ) where TEvent : IApplicationEvent;
     }
 
 }

@@ -2,6 +2,7 @@ using Application.Core.Features.Aws.AwsDetails.Register;
 using Application.Core.Interfaces;
 using Application.Core.Models.Requests;
 using Application.Core.Extensions;
+using Application.Core.Persistence;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +30,7 @@ namespace Application.Core.Features.Aws.AwsDetails.Update
 
     public class UpdateAwsDetailsHandler : ValidatableCommandHandler<RegisterAwsDetails.Command, RegisterAwsDetails.Command.Validator>
     {
-        public UpdateAwsDetailsHandler( Persistence.DataContext repository, ICypherService cypherService )
+        public UpdateAwsDetailsHandler( DataContext repository, ICypherService cypherService )
         {
             Validate( async x =>
             {

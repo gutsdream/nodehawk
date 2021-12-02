@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Application.Core.Extensions;
-using Application.Core.Features.SshManagement.Snapshots.Create;
 using Application.Core.Interfaces;
 using Application.Core.JobState;
 using Application.Core.Models.JobActivities;
 using Application.Core.Models.Requests;
-using Application.Core.Models.Results;
+using Application.Core.Persistence;
 using Application.Core.Shared;
 using Application.Core.Shared.Interfaces;
 using Domain.Entities;
@@ -34,7 +33,7 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
 
     public class CleanNodeCommandHandler : ValidatableCommandHandler<CleanNode.Command, CleanNode.Command.Validator>
     {
-        public CleanNodeCommandHandler( Persistence.DataContext repository,
+        public CleanNodeCommandHandler( DataContext repository,
             INodeHawkSshClient sshClient,
             JobActivityManager jobActivityManager,
             IEventManager eventManager )
@@ -54,7 +53,6 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
             // Thank u otnode.com <3
             OnSuccessfulValidation( async x =>
             {
-                // TODO: refactor this and other shared command based queries into somewhere
                 var node = await repository.Nodes
                     .Include( n => n.ConnectionDetails )
                     .FirstAsync( n => n.Id == x.NodeId );

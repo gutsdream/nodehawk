@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Application.Core.Interfaces;
 using Application.Core.Shared.Interfaces;
-using MediatR;
 using Moq;
 
 namespace Application.Testing.Mocks

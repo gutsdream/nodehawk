@@ -79,7 +79,15 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
             activity.CheckingSpaceUsed( );
 
             var dfCommandResult = nodeHawkSshClient.Run( new SshMessage("df .") );
-            var spaceUsed = GetSpaceUsedPercentageFromSshResult( dfCommandResult );
+            var spaceUsed = dfCommandResult.Content
+                .SplitToList( )
+                // Remove whitespace and line breaks
+                .Ignore( string.Empty, " ", "/\n" )
+                .FindWord( "Mounted" )
+                .SkipWords( 5 )
+                .Get( )
+                .RemoveNonNumericCharacters( )
+                .AsInt( );
 
             return spaceUsed;
         }
@@ -91,22 +99,6 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
             var containerRunningResult = nodeHawkSshClient.Run( new SshMessage("docker container inspect -f '{{.State.Running}}' otnode") );
             var containerRunning = containerRunningResult.Content.Contains( "true" );
             return containerRunning;
-        }
-
-        /// <summary>
-        /// Parses the response of a CLI 'df .h' command
-        /// </summary>
-        private static int GetSpaceUsedPercentageFromSshResult( ISshCommandResult result )
-        {
-            return result.Content
-                .SplitToList( )
-                // Remove whitespace and line breaks
-                .Ignore( string.Empty, " ", "/\n" )
-                .FindWord( "Mounted" )
-                .SkipWords( 5 )
-                .Get( )
-                .RemoveNonNumericCharacters( )
-                .AsInt( );
         }
     }
 }

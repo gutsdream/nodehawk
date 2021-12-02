@@ -1,9 +1,8 @@
 using System;
 using Application.Core.Extensions;
-using Application.Core.Features.SshManagement.Snapshots.Create;
 using Application.Core.Interfaces;
 using Application.Core.Models.Requests;
-using Application.Core.Models.Results;
+using Application.Core.Persistence;
 using Application.Core.Shared;
 using Application.Core.Shared.Interfaces;
 using Domain.Entities;
@@ -48,7 +47,7 @@ namespace Application.Core.Features.Nodes.Commands.Update
 
     public class UpdateNodeHandler : ValidatableCommandHandler<UpdateNode.Command, UpdateNode.Command.Validator>
     {
-        public UpdateNodeHandler( Persistence.DataContext repository, ICypherService cypherService, IEventManager eventManager )
+        public UpdateNodeHandler( DataContext repository, ICypherService cypherService, IEventManager eventManager )
         {
             Validate( async x =>
             {

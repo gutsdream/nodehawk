@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Models.Dtos;
 using Application.Core.Models.Results;
+using Application.Core.Persistence;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,9 +24,9 @@ namespace Application.Core.Features.Nodes.Queries.NodeDetails
 
     public class NodeDetailsHandler : IRequestHandler<NodeDetails.Query, IQueryResult<NodeDto>>
     {
-        private readonly Persistence.DataContext _repository;
+        private readonly DataContext _repository;
 
-        public NodeDetailsHandler( Persistence.DataContext repository )
+        public NodeDetailsHandler( DataContext repository )
         {
             _repository = repository;
         }

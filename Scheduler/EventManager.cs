@@ -6,7 +6,6 @@ using MediatR;
 
 namespace Scheduler
 {
-    // TODO: move out of scheduler 
     public class EventManager : IEventManager
     {
         private readonly IBackgroundJobClient _backgroundJobClient;
@@ -18,31 +17,15 @@ namespace Scheduler
             _mediator = mediator;
         }
 
-        public void PublishEvent( IApplicationEvent applicationEvent )
+        public void PublishEvent<TEvent>( TEvent applicationEvent ) where TEvent : IApplicationEvent
         {
-            // var jobQueue = new MediatorJobQueue<TRequest, TResult>( _mediator );
             _backgroundJobClient.Enqueue( ( ) => Publish( applicationEvent ) );
         }
 
-        private async Task Publish( IApplicationEvent applicationEvent )
+        // Must be public for HangFire to consume it
+        public async Task Publish<TEvent>( TEvent applicationEvent ) where TEvent : IApplicationEvent
         {
             await _mediator.Publish( applicationEvent );
         }
     }
-
-    // black magic fuckery allows for generics to be used, otherwise json serialization screams
-    // public class MediatorJobQueue<TRequest, TResult> where TRequest : IRequest<TResult>
-    // {
-    //     private readonly IMediator _mediator;
-    //
-    //     public MediatorJobQueue( IMediator mediator )
-    //     {
-    //         _mediator = mediator;
-    //     }
-    //
-    //     public async Task SendMediatrRequest( TRequest request )
-    //     {
-    //         await _mediator.Send( request );
-    //     }
-    // }
 }

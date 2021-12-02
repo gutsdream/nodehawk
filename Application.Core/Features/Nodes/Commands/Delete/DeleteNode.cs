@@ -1,6 +1,7 @@
 using System;
 using Application.Core.Extensions;
 using Application.Core.Models.Requests;
+using Application.Core.Persistence;
 using Application.Core.Shared;
 using FluentValidation;
 using FluentValidation.Results;
@@ -27,7 +28,7 @@ namespace Application.Core.Features.Nodes.Commands.Delete
 
     public class DeleteNodeHandler : ValidatableCommandHandler<DeleteNode.Command, DeleteNode.Command.Validator>
     {
-        public DeleteNodeHandler( Persistence.DataContext repository )
+        public DeleteNodeHandler( DataContext repository )
         {
             Validate( async x =>
             {

@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.JobState;
 using Application.Core.Models.Dtos;
-using Application.Core.Shared;
 using MediatR;
 
 namespace Application.Core.Features.JobManagement

@@ -1,10 +1,11 @@
 using Application.Core.Interfaces;
 using Application.Core.Models.Requests;
 using Application.Core.Extensions;
+using Application.Core.Persistence;
 using FluentValidation;
 using FluentValidation.Results;
-using Microsoft.EntityFrameworkCore;
 using Application.Core.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Core.Features.Aws.AwsDetails.Register
 {
@@ -28,7 +29,7 @@ namespace Application.Core.Features.Aws.AwsDetails.Register
 
     public class RegisterAwsDetailsHandler : ValidatableCommandHandler<RegisterAwsDetails.Command, RegisterAwsDetails.Command.Validator>
     {
-        public RegisterAwsDetailsHandler( Persistence.DataContext repository, ICypherService cypherService )
+        public RegisterAwsDetailsHandler( DataContext repository, ICypherService cypherService )
         {
             Validate( async x =>
             {

@@ -10,11 +10,12 @@ using Application.Core.Models.JobActivities;
 using Application.Core.Models.Requests;
 using Application.Core.Extensions;
 using Application.Core.JobState;
+using Application.Core.Persistence;
 using Domain.Entities;
 using FluentValidation;
 using FluentValidation.Results;
-using Microsoft.EntityFrameworkCore;
 using Application.Core.Shared;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Core.Features.Aws.BackupNode
 {
@@ -37,7 +38,7 @@ namespace Application.Core.Features.Aws.BackupNode
 
     public class BackupNodeHandler : ValidatableCommandHandler<BackupNode.Command, BackupNode.Command.Validator>
     {
-        public BackupNodeHandler( Persistence.DataContext repository,
+        public BackupNodeHandler( DataContext repository,
             ICypherService cypherService,
             JobActivityManager jobActivityManager,
             INodeHawkSshClient sshClient )

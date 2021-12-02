@@ -1,16 +1,13 @@
 using System;
-using System.Threading.Tasks;
 using Application.Core.Extensions;
-using Application.Core.Features.SshManagement.Snapshots.Create;
 using Application.Core.Interfaces;
 using Application.Core.Models.Requests;
-using Application.Core.Models.Results;
+using Application.Core.Persistence;
 using Application.Core.Shared;
 using Application.Core.Shared.Interfaces;
 using Domain.Entities;
 using FluentValidation;
 using FluentValidation.Results;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Core.Features.Nodes.Commands.Create
@@ -46,7 +43,7 @@ namespace Application.Core.Features.Nodes.Commands.Create
 
     public class CreateNodeHandler : ValidatableCommandHandler<CreateNode.Command, CreateNode.Command.Validator>
     {
-        public CreateNodeHandler( Persistence.DataContext repository, ICypherService cypherService, IEventManager eventManager )
+        public CreateNodeHandler( DataContext repository, ICypherService cypherService, IEventManager eventManager )
         {
             Validate( async x =>
             {
