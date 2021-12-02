@@ -19,6 +19,7 @@ namespace Domain.Entities
 
         public Snapshot MostRecentSnapshot => Snapshots.OrderByDescending( x => x.CreatedDateUtc ).FirstOrDefault( );
 
+        public DateTime CreatedDateUtc { get; protected set; }
         public DateTime? LastBackupDateUtc { get; protected set; }
         public DateTime? LastCleanedDateUtc { get; protected set; }
         public DateTime? LastSnapshotDateUtc { get; protected set; }
@@ -28,6 +29,7 @@ namespace Domain.Entities
 
         protected Node( )
         {
+            CreatedDateUtc = DateTime.UtcNow;
             Snapshots = new HashSet<Snapshot>( );
         }
 

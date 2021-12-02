@@ -30,6 +30,7 @@ namespace Application.Core.Features.Nodes.Queries.NodeList
         {
             var nodes = await _repository.Nodes
                 .Include( x => x.Snapshots )
+                .OrderBy( x => x.CreatedDateUtc )
                 .ToListAsync( );
 
             // Even if no nodes are found that's not technically invalid, it's a normal state to not have set up any nodes
