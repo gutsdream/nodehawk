@@ -1,11 +1,12 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Core.Features.SshManagement.Snapshots.Create;
+using Application.Core.Persistence;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 
-namespace Application.CommandHandling.Snapshots
+namespace Application.Core.Features.SshManagement.Snapshots.All
 {
     public class SnapshotAll
     {

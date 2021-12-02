@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Application.Interfaces;
+using Application.Core.Interfaces;
 
-namespace Application.CommandHandling
+namespace Application.Core.JobState
 {
     // TODO: yoink job is ex is thrown somehow
     public class JobActivityManager
