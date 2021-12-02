@@ -1,10 +1,10 @@
 using System;
-using Application.Core.JobState;
+using Application.Core.JobManagement;
 using Domain.Entities;
 
-namespace Application.Core.Models.JobActivities
+namespace Application.Core.Models.ActiveJobs
 {
-    public class CreateNodeSnapshotActivity : IJobActivity
+    public class CreateNodeSnapshot : IActiveJob
     {
         public Guid Id { get; }
         public string Title => $"Refreshing information for: '{_nodeTitle}'";
@@ -13,7 +13,7 @@ namespace Application.Core.Models.JobActivities
         private readonly string _nodeTitle;
         private string _status;
 
-        public CreateNodeSnapshotActivity( Node node )
+        public CreateNodeSnapshot( Node node )
         {
             Id = Guid.NewGuid( );
             _nodeTitle = node.Title;

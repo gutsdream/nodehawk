@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Application.Core.JobManagement;
 using Application.Core.Models.Requests;
 using Application.Core.Models.Results;
 using Domain.ExceptionHandling;
@@ -23,7 +25,9 @@ namespace Application.Core.Shared
         private Func<TCommand, Task<ValidationResult>> _validation;
         private Func<TCommand, Task> _onSuccess;
         private Func<TCommand, Task<ValidationResult>> _onFailure;
-        
+        private ActiveJobManager _activeJobManager;
+        private List<IActiveJob> _activities = new();
+
         /// <summary>
         /// Optional validation to be done before any actions are carried out. 
         /// </summary>
@@ -39,14 +43,26 @@ namespace Application.Core.Shared
         {
             _onSuccess = onSuccessFunc;
         }
+        
+        /// <summary>
+        /// Registers <see cref="ActiveJobManager"/> to allow Job State
+        /// </summary>
+        /// <param name="activeJobManager"></param>
+        protected void UsingJobManager( ActiveJobManager activeJobManager )
+        {
+            _activeJobManager = activeJobManager;
+        }
 
         /// <summary>
-        /// Optional override on failed validation.
+        /// Registers an activity which can be updated from the implemented handler. Will fail upon an exception being thrown or otherwise succeed.
         /// </summary>
-        /// <param name="onFailureFunc"></param>
-        public void OnFailure( Func<TCommand, Task<ValidationResult>> onFailureFunc )
+        /// <param name="activeJob"></param>
+        protected void RegisterActivity( IActiveJob activeJob )
         {
-            _onFailure = onFailureFunc;
+            Throw.If.Null( _activeJobManager, nameof( ActiveJobManager ) );
+            
+            _activities.Add( activeJob );
+            _activeJobManager.RegisterActivity( activeJob );
         }
 
         /// <summary>
@@ -82,7 +98,19 @@ namespace Application.Core.Shared
 
             Throw.If.Null( _onSuccess, nameof( _onSuccess ) );
 
-            await _onSuccess.Invoke( request );
+            try
+            {
+                await _onSuccess.Invoke( request );
+            }
+            catch ( Exception exception )
+            {
+                // We need to fail any registered job activities upon an exception being thrown
+                _activities.ForEach( x => _activeJobManager.FailActivity( x ) );
+                throw;
+            }
+
+            // Complete all registered job activities
+            _activities.ForEach( x => _activeJobManager.CompleteActivity( x ) );
 
             // return Successful
             return Success( );

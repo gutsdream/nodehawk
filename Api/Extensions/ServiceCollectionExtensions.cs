@@ -1,6 +1,6 @@
 using Application.Core.Features.Nodes.Queries.NodeList;
 using Application.Core.Interfaces;
-using Application.Core.JobState;
+using Application.Core.JobManagement;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Infrastructure.Encryption;
@@ -34,7 +34,7 @@ namespace Api.Extensions
             services.AddScoped<NodeHawkScheduledJobs, NodeHawkScheduledJobs>( );
             services.AddScoped<IEventManager, EventManager>( );
 
-            services.AddSingleton<JobActivityManager, JobActivityManager>( );
+            services.AddSingleton<ActiveJobManager, ActiveJobManager>( );
         }
     }
 }

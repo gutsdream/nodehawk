@@ -1,8 +1,8 @@
 using System;
 
-namespace Application.Core.JobState
+namespace Application.Core.JobManagement
 {
-    public interface IJobActivity
+    public interface IActiveJob
     {
         Guid Id { get; }
         string Title { get; }

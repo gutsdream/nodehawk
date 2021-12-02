@@ -6,15 +6,15 @@ using Amazon;
 using Amazon.Runtime;
 using Amazon.S3;
 using Application.Core.Interfaces;
-using Application.Core.Models.JobActivities;
 using Application.Core.Models.Requests;
 using Application.Core.Extensions;
-using Application.Core.JobState;
+using Application.Core.JobManagement;
 using Application.Core.Persistence;
 using Domain.Entities;
 using FluentValidation;
 using FluentValidation.Results;
 using Application.Core.Shared;
+using Application.Core.Shared.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Core.Features.Aws.BackupNode
@@ -40,8 +40,9 @@ namespace Application.Core.Features.Aws.BackupNode
     {
         public BackupNodeHandler( DataContext repository,
             ICypherService cypherService,
-            JobActivityManager jobActivityManager,
-            INodeHawkSshClient sshClient )
+            ActiveJobManager activeJobManager,
+            INodeHawkSshClient sshClient,
+            IEventManager eventManager )
         {
             Validate( async x =>
             {
@@ -71,20 +72,21 @@ namespace Application.Core.Features.Aws.BackupNode
 
                 var awsDetails = await repository.AwsDetails.FirstOrDefaultAsync( );
 
-                var nodeBackupActivity = new BackupNodeActivity( node );
-                jobActivityManager.RegisterActivity( nodeBackupActivity );
+                var nodeBackupActivity = new Models.ActiveJobs.BackupNode( node );
+                activeJobManager.RegisterActivity( nodeBackupActivity );
 
                 var client = GetS3ClientFromAwsDetails( cypherService, awsDetails );
+                
                 await CreateS3BucketForNodeIfNotFound( client, node, nodeBackupActivity );
 
-                // test
-                // throw new Exception( "something" );
                 BackupNode( cypherService, sshClient, awsDetails, node, nodeBackupActivity );
 
                 node.AuditBackup( );
                 await repository.SaveChangesAsync( );
-                
-                jobActivityManager.CompleteActivity( nodeBackupActivity );
+
+                activeJobManager.CompleteActivity( nodeBackupActivity );
+
+                eventManager.PublishEvent( new NodeBackedUpEvent( node.Id ) );
             } );
         }
 
@@ -104,12 +106,12 @@ namespace Application.Core.Features.Aws.BackupNode
 
         private static async Task CreateS3BucketForNodeIfNotFound( AmazonS3Client client,
             Node node,
-            BackupNodeActivity nodeBackupActivity )
+            Models.ActiveJobs.BackupNode nodeBackup )
         {
             var buckets = await client.ListBucketsAsync( CancellationToken.None );
             if ( buckets.Buckets.All( b => b.BucketName != GetBucketNameForNode( node ) ) )
             {
-                nodeBackupActivity.CreatingS3Bucket( );
+                nodeBackup.CreatingS3Bucket( );
                 await client.PutBucketAsync( GetBucketNameForNode( node ) );
             }
         }
@@ -118,12 +120,12 @@ namespace Application.Core.Features.Aws.BackupNode
             INodeHawkSshClient sshClient,
             Domain.Entities.AwsDetails awsDetails,
             Node node,
-            BackupNodeActivity nodeBackupActivity )
+            Models.ActiveJobs.BackupNode nodeBackup )
         {
-            nodeBackupActivity.ConnectingToNode( );
+            nodeBackup.ConnectingToNode( );
             sshClient.ConnectToNode( node );
 
-            nodeBackupActivity.RunningBackupScript( );
+            nodeBackup.RunningBackupScript( );
             sshClient.Run( BackupScriptSshCommand( cypherService.Decrypt( awsDetails.AccessKey ),
                 cypherService.Decrypt( awsDetails.SecretKey ),
                 GetBucketNameForNode( node ) ) );
@@ -134,6 +136,16 @@ namespace Application.Core.Features.Aws.BackupNode
             return new SshMessage( $"docker exec otnode node scripts/backup-upload-aws.js --config=/ot-node/.origintrail_noderc " +
                                    $"--configDir=/ot-node/data --backupDirectory=/ot-node/backup " +
                                    $"--AWSAccessKeyId={accessKey} --AWSSecretAccessKey={secretKey} --AWSBucketName={bucketName}" );
+        }
+    }
+    
+    public class NodeBackedUpEvent : IApplicationEvent
+    {
+        public Guid NodeId { get; }
+
+        public NodeBackedUpEvent( Guid nodeId )
+        {
+            NodeId = nodeId;
         }
     }
 }

@@ -1,10 +1,9 @@
 using System;
 using Application.Core.Interfaces;
-using Application.Core.Models.JobActivities;
 using Application.Core.Models.Requests;
 using Application.Core.Persistence;
 using Application.Core.Extensions;
-using Application.Core.JobState;
+using Application.Core.JobManagement;
 using Application.Core.Shared;
 using Domain.Entities;
 using FluentValidation;
@@ -32,7 +31,7 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
 
     public class CreateNodeSnapshotHandler : ValidatableCommandHandler<CreateNodeSnapshot.Command, CreateNodeSnapshot.Command.Validator>
     {
-        public CreateNodeSnapshotHandler( DataContext repository, INodeHawkSshClient nodeHawkSshClient, JobActivityManager jobActivityManager )
+        public CreateNodeSnapshotHandler( DataContext repository, INodeHawkSshClient nodeHawkSshClient, ActiveJobManager activeJobManager )
         {
             Validate( async x =>
             {
@@ -45,6 +44,8 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
 
                 return result;
             } );
+            
+            UsingJobManager( activeJobManager );
 
             OnSuccessfulValidation( async x =>
             {
@@ -53,8 +54,8 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
                     .Include( n => n.Snapshots )
                     .FirstAsync( n => n.Id == x.NodeId );
 
-                var activity = new CreateNodeSnapshotActivity( node );
-                jobActivityManager.RegisterActivity( activity );
+                var activity = new Models.ActiveJobs.CreateNodeSnapshot( node );
+                RegisterActivity( activity );
 
                 ConnectToNode( nodeHawkSshClient, activity, node );
 
@@ -62,19 +63,18 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
                 bool containerRunning = IsContainerRunning( nodeHawkSshClient, activity );
 
                 node.CreateSnapshot( spaceUsed, containerRunning );
-                jobActivityManager.CompleteActivity( activity );
 
                 await repository.SaveChangesAsync( );
             } );
         }
 
-        private static void ConnectToNode( INodeHawkSshClient nodeHawkSshClient, CreateNodeSnapshotActivity activity, Node node )
+        private static void ConnectToNode( INodeHawkSshClient nodeHawkSshClient, Models.ActiveJobs.CreateNodeSnapshot activity, Node node )
         {
             activity.ConnectingToNode( );
             nodeHawkSshClient.ConnectToNode( node );
         }
         
-        private static int GetSpaceUsed( INodeHawkSshClient nodeHawkSshClient, CreateNodeSnapshotActivity activity )
+        private static int GetSpaceUsed( INodeHawkSshClient nodeHawkSshClient, Models.ActiveJobs.CreateNodeSnapshot activity )
         {
             activity.CheckingSpaceUsed( );
 
@@ -92,7 +92,7 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
             return spaceUsed;
         }
         
-        private static bool IsContainerRunning( INodeHawkSshClient nodeHawkSshClient, CreateNodeSnapshotActivity activity )
+        private static bool IsContainerRunning( INodeHawkSshClient nodeHawkSshClient, Models.ActiveJobs.CreateNodeSnapshot activity )
         {
             activity.CheckingIfNodeOnline( );
 

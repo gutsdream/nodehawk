@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Core.JobState;
+using Application.Core.JobManagement;
 using MediatR;
 
 namespace Application.Core.Features.JobManagement.ActiveJobs
@@ -16,16 +16,16 @@ namespace Application.Core.Features.JobManagement.ActiveJobs
 
     public class GetActiveJobsHandler : IRequestHandler<GetActiveJobs.Query, List<JobActivityDto>>
     {
-        private readonly JobActivityManager _jobActivityManager;
+        private readonly ActiveJobManager _activeJobManager;
 
-        public GetActiveJobsHandler( JobActivityManager jobActivityManager )
+        public GetActiveJobsHandler( ActiveJobManager activeJobManager )
         {
-            _jobActivityManager = jobActivityManager;
+            _activeJobManager = activeJobManager;
         }
 
         public async Task<List<JobActivityDto>> Handle( GetActiveJobs.Query request, CancellationToken cancellationToken )
         {
-            return _jobActivityManager.JobActivities
+            return _activeJobManager.JobActivities
                 .Select( x => new JobActivityDto( x ) )
                 .ToList( );
         }
@@ -36,7 +36,7 @@ namespace Application.Core.Features.JobManagement.ActiveJobs
         public string Title { get; }
         public string Status { get; }
 
-        public JobActivityDto( IJobActivity activity )
+        public JobActivityDto( IActiveJob activity )
         {
             Title = activity.Title;
             Status = activity.Status;

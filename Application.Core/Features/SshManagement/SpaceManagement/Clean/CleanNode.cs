@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using Application.Core.Extensions;
 using Application.Core.Interfaces;
-using Application.Core.JobState;
-using Application.Core.Models.JobActivities;
+using Application.Core.JobManagement;
 using Application.Core.Models.Requests;
 using Application.Core.Persistence;
 using Application.Core.Shared;
@@ -35,7 +34,7 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
     {
         public CleanNodeCommandHandler( DataContext repository,
             INodeHawkSshClient sshClient,
-            JobActivityManager jobActivityManager,
+            ActiveJobManager activeJobManager,
             IEventManager eventManager )
         {
             Validate( async x =>
@@ -57,8 +56,8 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
                     .Include( n => n.ConnectionDetails )
                     .FirstAsync( n => n.Id == x.NodeId );
 
-                var cleanNodeActivity = new CleanNodeActivity( node );
-                jobActivityManager.RegisterActivity( cleanNodeActivity );
+                var cleanNodeActivity = new Models.ActiveJobs.CleanNode( node );
+                activeJobManager.RegisterActivity( cleanNodeActivity );
 
                 ConnectToNode( sshClient, cleanNodeActivity, node );
 
@@ -72,27 +71,27 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
 
                 await repository.SaveChangesAsync( );
 
-                jobActivityManager.CompleteActivity( cleanNodeActivity );
+                activeJobManager.CompleteActivity( cleanNodeActivity );
 
                 eventManager.PublishEvent( new NodeCleanedEvent( node.Id ) );
             } );
         }
 
-        private static void ConnectToNode( INodeHawkSshClient sshClient, CleanNodeActivity cleanNodeActivity, Node node )
+        private static void ConnectToNode( INodeHawkSshClient sshClient, Models.ActiveJobs.CleanNode cleanNode, Node node )
         {
-            cleanNodeActivity.ConnectingToNode( );
+            cleanNode.ConnectingToNode( );
             sshClient.ConnectToNode( node );
         }
 
-        private static void DeleteDockerOtNodeLogFile( INodeHawkSshClient sshClient, CleanNodeActivity cleanNodeActivity )
+        private static void DeleteDockerOtNodeLogFile( INodeHawkSshClient sshClient, Models.ActiveJobs.CleanNode cleanNode )
         {
-            cleanNodeActivity.DeletingDockerOtNodeLogFile( );
+            cleanNode.DeletingDockerOtNodeLogFile( );
             sshClient.Run( new SshMessage( "truncate -s 0 $(docker inspect -f '{{.LogPath}}' otnode)" ) );
         }
 
-        private static void DeleteDockerTextLogs( INodeHawkSshClient sshClient, CleanNodeActivity cleanNodeActivity )
+        private static void DeleteDockerTextLogs( INodeHawkSshClient sshClient, Models.ActiveJobs.CleanNode cleanNode )
         {
-            cleanNodeActivity.DeletingDockerTextLogs( );
+            cleanNode.DeletingDockerTextLogs( );
             sshClient.Run( new List<SshMessage>
             {
                 new("cd  /var/lib/docker/overlay2"),
@@ -100,9 +99,9 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
             } );
         }
 
-        private static void CleanCacheAndJournals( INodeHawkSshClient sshClient, CleanNodeActivity cleanNodeActivity )
+        private static void CleanCacheAndJournals( INodeHawkSshClient sshClient, Models.ActiveJobs.CleanNode cleanNode )
         {
-            cleanNodeActivity.CleaningCacheAndJournals( );
+            cleanNode.CleaningCacheAndJournals( );
             sshClient.Run( new List<SshMessage>
             {
                 new("apt clean"),
