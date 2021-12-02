@@ -3,10 +3,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.JobState;
-using Application.Core.Models.Dtos;
 using MediatR;
 
-namespace Application.Core.Features.JobManagement
+namespace Application.Core.Features.JobManagement.ActiveJobs
 {
     public class GetActiveJobs
     {
@@ -29,6 +28,18 @@ namespace Application.Core.Features.JobManagement
             return _jobActivityManager.JobActivities
                 .Select( x => new JobActivityDto( x ) )
                 .ToList( );
+        }
+    }
+    
+    public class JobActivityDto
+    {
+        public string Title { get; }
+        public string Status { get; }
+
+        public JobActivityDto( IJobActivity activity )
+        {
+            Title = activity.Title;
+            Status = activity.Status;
         }
     }
 }

@@ -67,6 +67,10 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
                 DeleteDockerTextLogs( sshClient, cleanNodeActivity );
 
                 CleanCacheAndJournals( sshClient, cleanNodeActivity );
+                
+                node.AuditCleanup( );
+
+                await repository.SaveChangesAsync( );
 
                 jobActivityManager.CompleteActivity( cleanNodeActivity );
 

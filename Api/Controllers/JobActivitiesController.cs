@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Application.Core.Features.JobManagement;
-using Application.Core.Models.Dtos;
+using Application.Core.Features.JobManagement.ActiveJobs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

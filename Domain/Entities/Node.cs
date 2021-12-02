@@ -19,6 +19,10 @@ namespace Domain.Entities
 
         public Snapshot MostRecentSnapshot => Snapshots.OrderByDescending( x => x.CreatedDateUtc ).FirstOrDefault( );
 
+        public DateTime? LastBackupDateUtc { get; protected set; }
+        public DateTime? LastCleanedDateUtc { get; protected set; }
+        public DateTime? LastSnapshotDateUtc { get; protected set; }
+
         public virtual ConnectionDetails ConnectionDetails { get; protected set; }
         public virtual ICollection<Snapshot> Snapshots { get; protected set; }
 
@@ -61,6 +65,18 @@ namespace Domain.Entities
         {
             var snapshot = new Snapshot( this, spaceUsedPercentage, containerRunning );
             Snapshots.Add( snapshot );
+
+            LastSnapshotDateUtc = DateTime.UtcNow;
+        }
+
+        public void AuditBackup( )
+        {
+            LastBackupDateUtc = DateTime.UtcNow;
+        }
+        
+        public void AuditCleanup( )
+        {
+            LastCleanedDateUtc = DateTime.UtcNow;
         }
 
         public class Snapshot : Entity

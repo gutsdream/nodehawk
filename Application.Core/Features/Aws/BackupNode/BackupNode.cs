@@ -81,6 +81,9 @@ namespace Application.Core.Features.Aws.BackupNode
                 // throw new Exception( "something" );
                 BackupNode( cypherService, sshClient, awsDetails, node, nodeBackupActivity );
 
+                node.AuditBackup( );
+                await repository.SaveChangesAsync( );
+                
                 jobActivityManager.CompleteActivity( nodeBackupActivity );
             } );
         }

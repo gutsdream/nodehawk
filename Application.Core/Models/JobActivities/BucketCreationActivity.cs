@@ -1,5 +1,5 @@
 using System;
-using Application.Core.Interfaces;
+using Application.Core.JobState;
 using Domain.Entities;
 
 namespace Application.Core.Models.JobActivities

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Application.Core.Interfaces;
 
 namespace Application.Core.JobState
 {
