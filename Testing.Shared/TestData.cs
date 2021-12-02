@@ -1,7 +1,7 @@
 using System;
+using Application.Core.Persistence;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 
 namespace Testing.Shared
 {

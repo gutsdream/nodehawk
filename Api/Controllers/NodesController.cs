@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Application.CommandHandling.Nodes;
-using Application.CommandHandling.Snapshots;
-using Application.Models.Dtos;
-using Application.QueryHandling.Nodes;
+using Application.Core.Features.Nodes.Commands.Create;
+using Application.Core.Features.Nodes.Commands.Delete;
+using Application.Core.Features.Nodes.Commands.Update;
+using Application.Core.Features.Nodes.Queries.NodeDetails;
+using Application.Core.Features.Nodes.Queries.NodeList;
+using Application.Core.Features.SshManagement.Snapshots.Create;
+using Application.Core.Features.SshManagement.SpaceManagement.Clean;
+using Application.Core.Models.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

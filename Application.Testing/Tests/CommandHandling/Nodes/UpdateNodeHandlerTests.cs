@@ -1,13 +1,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.CommandHandling;
-using Application.CommandHandling.Nodes;
-using Application.CommandHandling.Nodes.Interfaces;
-using Application.CommandHandling.Snapshots;
-using Application.Testing.Mocks;
+using Application.Core.Features.Nodes.Commands.Create;
+using Application.Core.Features.Nodes.Commands.Update;
+using Application.Core.Features.SshManagement.Snapshots.Create;
+using Application.Core.Models.Results;
 using Domain.Entities;
-using Persistence;
+using Application.Core.Persistence;
+using Application.Testing.Mocks;
 using Testing.Shared;
 using Xunit;
 
@@ -17,18 +17,15 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
     {
         private UpdateNodeHandler _updateNodeHandler;
 
-        private readonly BackgroundTaskManagerMock _backgroundTaskManagerMock;
+        private readonly EventManagerMock _eventManagerMock;
         private DataContext _context;
 
         public UpdateNodeHandlerTests( )
         {
-            _backgroundTaskManagerMock = new BackgroundTaskManagerMock( );
-            _backgroundTaskManagerMock.ConfigureQueue<CreateNodeSnapshot.Command, ICommandResult>( );
+            _eventManagerMock = new EventManagerMock( );
 
         }
-
         
-
         [Fact]
         public async Task Should_ReturnSuccess_When_CommandIsValid_And_NoExistingNodeMatchesTitleOrExternalId( )
         {
@@ -52,7 +49,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
 
             // Then
             Assert.True( result.IsSuccessful );
-            Assert.True( _backgroundTaskManagerMock.ContainsRequestType<CreateNodeSnapshot.Command>( ) );
+            Assert.True( _eventManagerMock.ContainsRequestType<NodeUpdatedEvent>( ) );
         }
 
         [Fact]
@@ -356,7 +353,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             Then.ResultContainsError( result, nameof( command.ExternalId ), $"Different node with {nameof( Node.ExternalId )} '{externalId}' already exists." );
         }
 
-        private static Node UpdateNodeFromCommand( IMutateNode command )
+        private static Node UpdateNodeFromCommand( UpdateNode.Command command )
         {
             return new Node( command.Title, new ConnectionDetails( command.Host, command.Username, command.Key ), command.ExternalId );
         }
@@ -378,7 +375,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
 
             _updateNodeHandler = new UpdateNodeHandler( _context,
                 cypherServiceMock.Object,
-                _backgroundTaskManagerMock.Object );
+                _eventManagerMock.Object );
         }
     }
 }

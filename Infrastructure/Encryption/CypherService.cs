@@ -1,4 +1,4 @@
-using Application.Interfaces;
+using Application.Core.Interfaces;
 using Microsoft.AspNetCore.DataProtection;
 
 namespace Infrastructure.Encryption

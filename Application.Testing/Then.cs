@@ -1,4 +1,4 @@
-using Application.CommandHandling;
+using Application.Core.Models.Results;
 using Xunit;
 
 namespace Application.Testing

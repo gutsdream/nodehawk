@@ -1,6 +1,6 @@
-using Application.CommandHandling;
-using Application.Interfaces;
-using Application.QueryHandling.Nodes;
+using Application.Core.Features.Nodes.Queries.NodeList;
+using Application.Core.Interfaces;
+using Application.Core.JobState;
 using Hangfire;
 using Hangfire.MemoryStorage;
 using Infrastructure.Encryption;
@@ -9,7 +9,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence;
+using Application.Core.Persistence;
+using Application.Core.Shared;
 using Scheduler;
 using Scheduler.SnapshotScheduler;
 
@@ -32,7 +33,7 @@ namespace Api.Extensions
             services.AddHangfireServer( );
             
             services.AddScoped<NodeHawkScheduledJobs, NodeHawkScheduledJobs>( );
-            services.AddScoped<IBackgroundTaskManager, BackgroundTaskManager>( );
+            services.AddScoped<IEventManager, EventManager>( );
 
             services.AddSingleton<JobActivityManager, JobActivityManager>( );
         }

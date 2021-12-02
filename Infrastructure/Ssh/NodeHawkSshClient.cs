@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Application.Interfaces;
+using Application.Core.Interfaces;
 using Domain.Entities;
 using Renci.SshNet;
 
@@ -29,7 +29,7 @@ namespace Infrastructure.Ssh
             _sshClient.Connect( );
         }
 
-        public ISshCommandResult Run( Application.Constants.Ssh.Message nodeHawkSshMessage )
+        public ISshCommandResult Run( SshMessage nodeHawkSshMessage )
         {
             if ( _sshClient == null || !_sshClient.IsConnected )
             {
@@ -40,7 +40,7 @@ namespace Infrastructure.Ssh
             return new SshCommandResult( command );
         }
 
-        public ISshCommandResult Run( List<Application.Constants.Ssh.Message> nodeHawkSshMessages )
+        public ISshCommandResult Run( List<SshMessage> nodeHawkSshMessages )
         {
             var commands = new List<SshCommand>( );
             foreach ( var message in nodeHawkSshMessages )

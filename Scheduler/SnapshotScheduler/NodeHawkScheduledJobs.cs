@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using Application.CommandHandling.Nodes;
-using Application.CommandHandling.Snapshots;
+using Application.Core.Features.SshManagement.Snapshots.All;
+using Application.Core.Features.SshManagement.Snapshots.Clean;
 using MediatR;
 
 namespace Scheduler.SnapshotScheduler

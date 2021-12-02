@@ -1,13 +1,12 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Application.CommandHandling;
-using Application.CommandHandling.Nodes;
-using Application.CommandHandling.Nodes.Interfaces;
-using Application.CommandHandling.Snapshots;
+using Application.Core.Features.Nodes.Commands.Create;
+using Application.Core.Features.SshManagement.Snapshots.Create;
+using Application.Core.Models.Results;
+using Application.Core.Persistence;
 using Application.Testing.Mocks;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using Testing.Shared;
 using Xunit;
 
@@ -18,12 +17,11 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         private CreateNodeHandler _createNodeHandler;
         private DataContext _context;
         
-        private readonly BackgroundTaskManagerMock _backgroundTaskManagerMock;
+        private readonly EventManagerMock _eventManagerMock;
 
         public CreateNodeHandlerTests( )
         {
-            _backgroundTaskManagerMock = new BackgroundTaskManagerMock( );
-            _backgroundTaskManagerMock.ConfigureQueue<CreateNodeSnapshot.Command, ICommandResult>( );
+            _eventManagerMock = new EventManagerMock( );
         }
 
         [Fact]
@@ -48,7 +46,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             // Then
             Assert.True( result.IsSuccessful );
             Assert.True( await _context.Nodes.AnyAsync( x => x.Title == title ) );
-            Assert.True( _backgroundTaskManagerMock.ContainsRequestType<CreateNodeSnapshot.Command>( ) );
+            Assert.True( _eventManagerMock.ContainsRequestType<NodeCreatedEvent>( ) );
         }
 
         [Theory]
@@ -281,7 +279,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             Then.ResultContainsError( result, nameof( command.ExternalId ), $"Node with {nameof( Node.ExternalId )} '{externalId}' already exists." );
         }
 
-        private static Node CreateNodeFromCommand( IMutateNode command )
+        private static Node CreateNodeFromCommand( CreateNode.Command command )
         {
             return new Node( command.Title, new ConnectionDetails( command.Host, command.Username, command.Key ), command.ExternalId );
         }
@@ -292,7 +290,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
 
             _createNodeHandler = new CreateNodeHandler( _context,
                 new CypherServiceMock( ).Object,
-                _backgroundTaskManagerMock.Object );
+                _eventManagerMock.Object );
             
         }
     }

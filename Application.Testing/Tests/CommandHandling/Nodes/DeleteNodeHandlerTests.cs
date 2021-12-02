@@ -1,9 +1,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.CommandHandling.Nodes;
+using Application.Core.Features.Nodes.Commands.Delete;
+using Application.Core.Persistence;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using Testing.Shared;
 using Xunit;
 

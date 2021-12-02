@@ -1,5 +1,4 @@
-using Application.CommandHandling;
-using Application.QueryHandling;
+using Application.Core.Models.Results;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

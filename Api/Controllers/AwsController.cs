@@ -1,5 +1,7 @@
 using System.Threading.Tasks;
-using Application.CommandHandling.Aws;
+using Application.Core.Features.Aws.AwsDetails.Register;
+using Application.Core.Features.Aws.AwsDetails.Update;
+using Application.Core.Features.Aws.BackupNode;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
