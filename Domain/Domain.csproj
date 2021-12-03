@@ -4,4 +4,10 @@
         <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Reference Include="Application.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Application.Testing\bin\Debug\net5.0\Application.Core.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

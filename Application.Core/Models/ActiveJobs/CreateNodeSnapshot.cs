@@ -1,6 +1,6 @@
 using System;
-using Application.Core.JobManagement;
 using Domain.Entities;
+using Domain.Interfaces;
 
 namespace Application.Core.Models.ActiveJobs
 {
@@ -9,7 +9,8 @@ namespace Application.Core.Models.ActiveJobs
         public Guid Id { get; }
         public string Title => $"Refreshing information for: '{_nodeTitle}'";
         public string Status => _status;
-        
+        public JobType JobType => JobType.Snapshot;
+
         private readonly string _nodeTitle;
         private string _status;
 

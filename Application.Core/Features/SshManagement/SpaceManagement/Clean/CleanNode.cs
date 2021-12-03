@@ -49,6 +49,8 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
                 return result;
             } );
 
+            UsingJobs( activeJobManager, repository );
+
             // Thank u otnode.com <3
             OnSuccessfulValidation( async x =>
             {
@@ -57,7 +59,7 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
                     .FirstAsync( n => n.Id == x.NodeId );
 
                 var cleanNodeActivity = new Models.ActiveJobs.CleanNode( node );
-                activeJobManager.RegisterActivity( cleanNodeActivity );
+                RegisterActiveJob( cleanNodeActivity );
 
                 ConnectToNode( sshClient, cleanNodeActivity, node );
 
@@ -66,12 +68,10 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
                 DeleteDockerTextLogs( sshClient, cleanNodeActivity );
 
                 CleanCacheAndJournals( sshClient, cleanNodeActivity );
-                
+
                 node.AuditCleanup( );
 
                 await repository.SaveChangesAsync( );
-
-                activeJobManager.CompleteActivity( cleanNodeActivity );
 
                 eventManager.PublishEvent( new NodeCleanedEvent( node.Id ) );
             } );

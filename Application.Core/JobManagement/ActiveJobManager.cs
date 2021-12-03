@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Domain.Interfaces;
 
 namespace Application.Core.JobManagement
 {
@@ -21,13 +22,8 @@ namespace Application.Core.JobManagement
             _activeJobs.Add( activity );
         }
 
-        // TODO: persist activity as successful or not, use signalr to push notifications
-        public void CompleteActivity( IActiveJob activity )
-        {
-            _activeJobs.RemoveAll( x => x.Id == activity.Id );
-        }
-        
-        public void FailActivity( IActiveJob activity )
+        // Use SignalR to notify front end
+        public void RemoveActivity( IActiveJob activity )
         {
             _activeJobs.RemoveAll( x => x.Id == activity.Id );
         }
@@ -37,6 +33,7 @@ namespace Application.Core.JobManagement
             public Guid Id { get; }
             public string Title => $"Fake Job Activity: {Id}";
             public string Status => "I'm here for frontend testing and will soon die!";
+            public JobType JobType => JobType.Snapshot;
 
             public Fake( )
             {

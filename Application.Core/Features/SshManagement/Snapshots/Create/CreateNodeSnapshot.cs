@@ -31,7 +31,10 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
 
     public class CreateNodeSnapshotHandler : ValidatableCommandHandler<CreateNodeSnapshot.Command, CreateNodeSnapshot.Command.Validator>
     {
-        public CreateNodeSnapshotHandler( DataContext repository, INodeHawkSshClient nodeHawkSshClient, ActiveJobManager activeJobManager )
+        public CreateNodeSnapshotHandler( DataContext repository, 
+            INodeHawkSshClient nodeHawkSshClient, 
+            ActiveJobManager activeJobManager,
+            IEventManager eventManager )
         {
             Validate( async x =>
             {
@@ -45,7 +48,7 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
                 return result;
             } );
             
-            UsingJobManager( activeJobManager );
+            UsingJobs( activeJobManager, repository );
 
             OnSuccessfulValidation( async x =>
             {
@@ -55,7 +58,7 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
                     .FirstAsync( n => n.Id == x.NodeId );
 
                 var activity = new Models.ActiveJobs.CreateNodeSnapshot( node );
-                RegisterActivity( activity );
+                RegisterActiveJob( activity );
 
                 ConnectToNode( nodeHawkSshClient, activity, node );
 

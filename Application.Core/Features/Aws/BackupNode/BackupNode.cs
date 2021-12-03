@@ -64,6 +64,8 @@ namespace Application.Core.Features.Aws.BackupNode
                 return result;
             } );
 
+            UsingJobs( activeJobManager, repository );
+
             OnSuccessfulValidation( async x =>
             {
                 var node = await repository.Nodes
@@ -73,18 +75,16 @@ namespace Application.Core.Features.Aws.BackupNode
                 var awsDetails = await repository.AwsDetails.FirstOrDefaultAsync( );
 
                 var nodeBackupActivity = new Models.ActiveJobs.BackupNode( node );
-                activeJobManager.RegisterActivity( nodeBackupActivity );
+                RegisterActiveJob( nodeBackupActivity );
 
                 var client = GetS3ClientFromAwsDetails( cypherService, awsDetails );
-                
+
                 await CreateS3BucketForNodeIfNotFound( client, node, nodeBackupActivity );
 
                 BackupNode( cypherService, sshClient, awsDetails, node, nodeBackupActivity );
 
                 node.AuditBackup( );
                 await repository.SaveChangesAsync( );
-
-                activeJobManager.CompleteActivity( nodeBackupActivity );
 
                 eventManager.PublishEvent( new NodeBackedUpEvent( node.Id ) );
             } );
@@ -138,7 +138,7 @@ namespace Application.Core.Features.Aws.BackupNode
                                    $"--AWSAccessKeyId={accessKey} --AWSSecretAccessKey={secretKey} --AWSBucketName={bucketName}" );
         }
     }
-    
+
     public class NodeBackedUpEvent : IApplicationEvent
     {
         public Guid NodeId { get; }

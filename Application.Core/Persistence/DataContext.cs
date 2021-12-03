@@ -27,5 +27,6 @@ namespace Application.Core.Persistence
         public DbSet<Node> Nodes { get; set; }
         public DbSet<Node.Snapshot> NodeSnapshots { get; set; }
         public DbSet<AwsDetails> AwsDetails { get; set; }
+        public DbSet<FinalizedJob> FinalizedJobs { get; set; }
     }
 }

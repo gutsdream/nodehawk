@@ -10,6 +10,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Application.Core.Persistence;
+using Application.Core.Shared;
+using Application.Core.Shared.Interfaces;
+using Newtonsoft.Json;
 using Scheduler;
 using Scheduler.SnapshotScheduler;
 
@@ -28,8 +31,14 @@ namespace Api.Extensions
 
             services.AddMediatR( typeof( NodeListQueryHandler ).Assembly );
 
-            services.AddHangfire( x => { x.UseMemoryStorage( ); } );
+            services.AddHangfire( x => { 
+                x.UseMemoryStorage( );
+            } );
             services.AddHangfireServer( );
+            
+            var settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
+
+            // GlobalConfiguration.Configuration.UseSerializerSettings( new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All } );
             
             services.AddScoped<NodeHawkScheduledJobs, NodeHawkScheduledJobs>( );
             services.AddScoped<IEventManager, EventManager>( );
