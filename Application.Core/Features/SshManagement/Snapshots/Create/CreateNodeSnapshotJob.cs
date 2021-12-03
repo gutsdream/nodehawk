@@ -2,9 +2,9 @@ using System;
 using Domain.Entities;
 using Domain.Interfaces;
 
-namespace Application.Core.Models.ActiveJobs
+namespace Application.Core.Features.SshManagement.Snapshots.Create
 {
-    public class CreateNodeSnapshot : IActiveJob
+    public class CreateNodeSnapshotJob : IActiveJob
     {
         public Guid Id { get; }
         public string Title => $"Refreshing information for: '{_nodeTitle}'";
@@ -14,7 +14,7 @@ namespace Application.Core.Models.ActiveJobs
         private readonly string _nodeTitle;
         private string _status;
 
-        public CreateNodeSnapshot( Node node )
+        public CreateNodeSnapshotJob( Node node )
         {
             Id = Guid.NewGuid( );
             _nodeTitle = node.Title;

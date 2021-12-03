@@ -72,7 +72,7 @@ namespace Application.Core.Features.Aws.BackupNode
 
                 var awsDetails = await repository.AwsDetails.FirstOrDefaultAsync( );
 
-                var nodeBackupActivity = new Models.ActiveJobs.BackupNode( node );
+                var nodeBackupActivity = new BackupNodeJob( node );
                 
                 using var transientJobManager = transientJobManagerFactory.Create( );
                 transientJobManager.RegisterActiveJob( nodeBackupActivity );
@@ -107,12 +107,12 @@ namespace Application.Core.Features.Aws.BackupNode
 
         private static async Task CreateS3BucketForNodeIfNotFound( AmazonS3Client client,
             Node node,
-            Models.ActiveJobs.BackupNode nodeBackup )
+            BackupNodeJob nodeJobBackup )
         {
             var buckets = await client.ListBucketsAsync( CancellationToken.None );
             if ( buckets.Buckets.All( b => b.BucketName != GetBucketNameForNode( node ) ) )
             {
-                nodeBackup.CreatingS3Bucket( );
+                nodeJobBackup.CreatingS3Bucket( );
                 await client.PutBucketAsync( GetBucketNameForNode( node ) );
             }
         }
@@ -121,12 +121,12 @@ namespace Application.Core.Features.Aws.BackupNode
             INodeHawkSshClient sshClient,
             Domain.Entities.AwsDetails awsDetails,
             Node node,
-            Models.ActiveJobs.BackupNode nodeBackup )
+            BackupNodeJob nodeJobBackup )
         {
-            nodeBackup.ConnectingToNode( );
+            nodeJobBackup.ConnectingToNode( );
             sshClient.ConnectToNode( node );
 
-            nodeBackup.RunningBackupScript( );
+            nodeJobBackup.RunningBackupScript( );
             sshClient.Run( BackupScriptSshCommand( cypherService.Decrypt( awsDetails.AccessKey ),
                 cypherService.Decrypt( awsDetails.SecretKey ),
                 GetBucketNameForNode( node ) ) );
@@ -140,13 +140,5 @@ namespace Application.Core.Features.Aws.BackupNode
         }
     }
 
-    public class NodeBackedUpEvent : IApplicationEvent
-    {
-        public Guid NodeId { get; }
-
-        public NodeBackedUpEvent( Guid nodeId )
-        {
-            NodeId = nodeId;
-        }
-    }
+    
 }

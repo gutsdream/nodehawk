@@ -2,10 +2,10 @@ using System;
 using Domain.Entities;
 using Domain.Interfaces;
 
-namespace Application.Core.Models.ActiveJobs
+namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
 {
     // TODO: move these into their respective vertical slices
-    public class CleanNode : IActiveJob
+    public class CleanNodeJob : IActiveJob
     {
         public Guid Id { get; }
         public string Title => $"Cleaning Node: '{_nodeTitle}'";
@@ -15,7 +15,7 @@ namespace Application.Core.Models.ActiveJobs
         private readonly string _nodeTitle;
         private string _status;
 
-        public CleanNode( Node node )
+        public CleanNodeJob( Node node )
         {
             Id = Guid.NewGuid( );
             _nodeTitle = node.Title;

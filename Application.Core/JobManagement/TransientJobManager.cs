@@ -42,7 +42,7 @@ namespace Application.Core.JobManagement
         /// <summary>
         /// Removes the activity from the in memory tracker, persists it as a failure and sends a notification.
         /// </summary>
-        public void MarkJobAsFailure( IActiveJob activity )
+        private void MarkJobAsFailure( IActiveJob activity )
         {
             var job = FinalizedJob.Failure( activity );
             CompleteJob( activity, job );
@@ -62,7 +62,7 @@ namespace Application.Core.JobManagement
         // Using Dispose as DisposeAsync is not supported by HangFire currently - may look into creating PR for this.
         public void Dispose( )
         {
-            // Copying list so we can enumerate over a fresh collection whilst fucking with the original. She'll be right 
+            // Copying list so we can enumerate over a fresh collection whilst messing with the original. She'll be right 
             var jobsForFailure = _jobsRegisteredInScope.ToList();
             
             foreach ( var jobToFail in jobsForFailure )

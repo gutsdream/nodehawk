@@ -31,16 +31,4 @@ namespace Application.Core.Features.JobManagement.ActiveJobs
                 .ToList( );
         }
     }
-    
-    public class JobActivityDto
-    {
-        public string Title { get; }
-        public string Status { get; }
-
-        public JobActivityDto( IActiveJob activity )
-        {
-            Title = activity.Title;
-            Status = activity.Status;
-        }
-    }
 }

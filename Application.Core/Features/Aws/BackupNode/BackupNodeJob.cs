@@ -2,9 +2,9 @@ using System;
 using Domain.Entities;
 using Domain.Interfaces;
 
-namespace Application.Core.Models.ActiveJobs
+namespace Application.Core.Features.Aws.BackupNode
 {
-    public class BackupNode : IActiveJob
+    public class BackupNodeJob : IActiveJob
     {
         public Guid Id { get; }
         public string Title => $"Backing up Node: '{_nodeTitle}'";
@@ -14,7 +14,7 @@ namespace Application.Core.Models.ActiveJobs
         private readonly string _nodeTitle;
         private string _status;
 
-        public BackupNode( Node node )
+        public BackupNodeJob( Node node )
         {
             Id = Guid.NewGuid( );
             _nodeTitle = node.Title;

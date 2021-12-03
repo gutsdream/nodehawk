@@ -56,7 +56,7 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
                     .Include( n => n.ConnectionDetails )
                     .FirstAsync( n => n.Id == x.NodeId );
 
-                var cleanNodeActivity = new Models.ActiveJobs.CleanNode( node );
+                var cleanNodeActivity = new CleanNodeJob( node );
                 
                 using var transientJobManager = transientJobManagerFactory.Create( );
                 transientJobManager.RegisterActiveJob( cleanNodeActivity );
@@ -78,21 +78,21 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
             } );
         }
 
-        private static void ConnectToNode( INodeHawkSshClient sshClient, Models.ActiveJobs.CleanNode cleanNode, Node node )
+        private static void ConnectToNode( INodeHawkSshClient sshClient, CleanNodeJob cleanNodeJob, Node node )
         {
-            cleanNode.ConnectingToNode( );
+            cleanNodeJob.ConnectingToNode( );
             sshClient.ConnectToNode( node );
         }
 
-        private static void DeleteDockerOtNodeLogFile( INodeHawkSshClient sshClient, Models.ActiveJobs.CleanNode cleanNode )
+        private static void DeleteDockerOtNodeLogFile( INodeHawkSshClient sshClient, CleanNodeJob cleanNodeJob )
         {
-            cleanNode.DeletingDockerOtNodeLogFile( );
+            cleanNodeJob.DeletingDockerOtNodeLogFile( );
             sshClient.Run( new SshMessage( "truncate -s 0 $(docker inspect -f '{{.LogPath}}' otnode)" ) );
         }
 
-        private static void DeleteDockerTextLogs( INodeHawkSshClient sshClient, Models.ActiveJobs.CleanNode cleanNode )
+        private static void DeleteDockerTextLogs( INodeHawkSshClient sshClient, CleanNodeJob cleanNodeJob )
         {
-            cleanNode.DeletingDockerTextLogs( );
+            cleanNodeJob.DeletingDockerTextLogs( );
             sshClient.Run( new List<SshMessage>
             {
                 new("cd  /var/lib/docker/overlay2"),
@@ -100,24 +100,14 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
             } );
         }
 
-        private static void CleanCacheAndJournals( INodeHawkSshClient sshClient, Models.ActiveJobs.CleanNode cleanNode )
+        private static void CleanCacheAndJournals( INodeHawkSshClient sshClient, CleanNodeJob cleanNodeJob )
         {
-            cleanNode.CleaningCacheAndJournals( );
+            cleanNodeJob.CleaningCacheAndJournals( );
             sshClient.Run( new List<SshMessage>
             {
                 new("apt clean"),
                 new("journalctl --vacuum-time=1h")
             } );
-        }
-    }
-
-    public class NodeCleanedEvent : IApplicationEvent
-    {
-        public Guid NodeId { get; }
-
-        public NodeCleanedEvent( Guid nodeId )
-        {
-            NodeId = nodeId;
         }
     }
 }

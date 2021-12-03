@@ -54,7 +54,7 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
                     .Include( n => n.Snapshots )
                     .FirstAsync( n => n.Id == x.NodeId );
 
-                var activity = new Models.ActiveJobs.CreateNodeSnapshot( node );
+                var activity = new CreateNodeSnapshotJob( node );
                 
                 using var transientJobManager = transientJobManagerFactory.Create( );
                 transientJobManager.RegisterActiveJob( activity );
@@ -71,13 +71,13 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
             } );
         }
 
-        private static void ConnectToNode( INodeHawkSshClient nodeHawkSshClient, Models.ActiveJobs.CreateNodeSnapshot activity, Node node )
+        private static void ConnectToNode( INodeHawkSshClient nodeHawkSshClient, CreateNodeSnapshotJob activity, Node node )
         {
             activity.ConnectingToNode( );
             nodeHawkSshClient.ConnectToNode( node );
         }
         
-        private static int GetSpaceUsed( INodeHawkSshClient nodeHawkSshClient, Models.ActiveJobs.CreateNodeSnapshot activity )
+        private static int GetSpaceUsed( INodeHawkSshClient nodeHawkSshClient, CreateNodeSnapshotJob activity )
         {
             activity.CheckingSpaceUsed( );
 
@@ -95,7 +95,7 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
             return spaceUsed;
         }
         
-        private static bool IsContainerRunning( INodeHawkSshClient nodeHawkSshClient, Models.ActiveJobs.CreateNodeSnapshot activity )
+        private static bool IsContainerRunning( INodeHawkSshClient nodeHawkSshClient, CreateNodeSnapshotJob activity )
         {
             activity.CheckingIfNodeOnline( );
 
