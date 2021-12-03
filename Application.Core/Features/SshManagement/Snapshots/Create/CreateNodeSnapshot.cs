@@ -66,8 +66,6 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
 
                 node.CreateSnapshot( spaceUsed, containerRunning );
 
-                throw new Exception( );
-
                 await repository.SaveChangesAsync( );
                 transientJobManager.MarkJobAsSuccess( activity );
             } );
