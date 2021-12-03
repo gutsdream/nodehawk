@@ -1,0 +1,44 @@
+body {
+  background-color: #EAEAEA !important;
+}
+
+.ui.inverted.top.fixed.menu{
+  background-image: linear-gradient(135deg, rgb(40, 43, 61) 0%, rgb(63, 68, 97) 69%, rgb(77, 83, 112) 89%);
+  height: 80px;
+  margin-bottom:80px;
+  align-items: center;
+  text-align: center;
+}
+
+.ui.menu .item>i.icon{
+  font-size:20px;
+}
+
+.ui.inverted.menu .header.item {
+  font-size:20px;
+  width:auto;
+}
+
+.ui.inverted.menu .item {
+  font-size:16px;
+  align-self: center;
+  text-align: center;
+}
+
+.ui.menu .item>i.sync.alternate.icon {
+  margin-right:0px;
+  margin-left:auto;
+}
+
+.ui.menu .item>i.setting.icon {
+  margin-right:0px;
+  margin-left:auto;
+}
+
+.navbar-grid-container{
+  display: grid !important;
+  grid-template-columns: 20% 75% 5%;
+  padding: 0!important;
+  margin: 0!important;
+  width:100%;
+}
