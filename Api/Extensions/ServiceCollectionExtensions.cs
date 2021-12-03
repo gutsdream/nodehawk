@@ -43,7 +43,8 @@ namespace Api.Extensions
             services.AddScoped<NodeHawkScheduledJobs, NodeHawkScheduledJobs>( );
             services.AddScoped<IEventManager, EventManager>( );
 
-            services.AddSingleton<ActiveJobManager, ActiveJobManager>( );
+            services.AddSingleton<InMemoryActiveJobTracker, InMemoryActiveJobTracker>( );
+            services.AddScoped<TransientJobManagerFactory, TransientJobManagerFactory>( );
         }
     }
 }

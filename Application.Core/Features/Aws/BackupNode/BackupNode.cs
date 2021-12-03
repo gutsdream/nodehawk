@@ -40,7 +40,7 @@ namespace Application.Core.Features.Aws.BackupNode
     {
         public BackupNodeHandler( DataContext repository,
             ICypherService cypherService,
-            ActiveJobManager activeJobManager,
+            TransientJobManagerFactory transientJobManagerFactory,
             INodeHawkSshClient sshClient,
             IEventManager eventManager )
         {
@@ -64,8 +64,6 @@ namespace Application.Core.Features.Aws.BackupNode
                 return result;
             } );
 
-            UsingJobs( activeJobManager, repository );
-
             OnSuccessfulValidation( async x =>
             {
                 var node = await repository.Nodes
@@ -75,7 +73,9 @@ namespace Application.Core.Features.Aws.BackupNode
                 var awsDetails = await repository.AwsDetails.FirstOrDefaultAsync( );
 
                 var nodeBackupActivity = new Models.ActiveJobs.BackupNode( node );
-                RegisterActiveJob( nodeBackupActivity );
+                
+                using var transientJobManager = transientJobManagerFactory.Create( );
+                transientJobManager.RegisterActiveJob( nodeBackupActivity );
 
                 var client = GetS3ClientFromAwsDetails( cypherService, awsDetails );
 
@@ -85,6 +85,7 @@ namespace Application.Core.Features.Aws.BackupNode
 
                 node.AuditBackup( );
                 await repository.SaveChangesAsync( );
+                transientJobManager.MarkJobAsSuccess( nodeBackupActivity );
 
                 eventManager.PublishEvent( new NodeBackedUpEvent( node.Id ) );
             } );

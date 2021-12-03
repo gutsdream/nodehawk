@@ -8,8 +8,6 @@ using Application.Core.JobManagement;
 using Application.Core.Models.Requests;
 using Application.Core.Models.Results;
 using Application.Core.Persistence;
-using Application.Core.Shared.Interfaces;
-using Domain.Entities;
 using Domain.ExceptionHandling;
 using Domain.Interfaces;
 using FluentValidation;
@@ -27,14 +25,8 @@ namespace Application.Core.Shared
     public abstract class ValidatableCommandHandler<TCommand, TValidator> : IRequestHandler<TCommand, ICommandResult>
         where TCommand : ValidatableCommand<TCommand, TValidator> where TValidator : AbstractValidator<TCommand>, new( )
     {
-        private ActiveJobManager _activeJobManager;
-        private IEventManager _eventManager;
-        
         private Func<TCommand, Task<ValidationResult>> _validation;
         private Func<TCommand, Task> _onSuccess;
-        
-        private readonly List<IActiveJob> _activities = new( );
-        private DataContext _context;
 
         /// <summary>
         /// Optional validation to be done before any actions are carried out. 
@@ -50,28 +42,6 @@ namespace Application.Core.Shared
         protected void OnSuccessfulValidation( Func<TCommand, Task> onSuccessFunc )
         {
             _onSuccess = onSuccessFunc;
-        }
-
-        /// <summary>
-        /// Allows for the job subscription + publishing
-        /// </summary>
-        protected void UsingJobs( ActiveJobManager activeJobManager, DataContext context )
-        {
-            // TODO: replace with an eventing type thing when hangfire isnt a piece of dogshit
-            _activeJobManager = activeJobManager;
-            _context = context;
-        }
-
-        /// <summary>
-        /// Registers an activity which can be updated from the implemented handler. Will fail upon an exception being thrown or otherwise succeed.
-        /// </summary>
-        /// <param name="activeJob"></param>
-        protected void RegisterActiveJob( IActiveJob activeJob )
-        {
-            Throw.If.Null( _activeJobManager, nameof( ActiveJobManager ) );
-
-            _activities.Add( activeJob );
-            _activeJobManager.RegisterActivity( activeJob );
         }
 
         /// <summary>
@@ -102,34 +72,8 @@ namespace Application.Core.Shared
 
             Throw.If.Null( _onSuccess, nameof( _onSuccess ) );
 
-            try
-            {
-                await _onSuccess.Invoke( request );
-            }
-            catch ( Exception exception )
-            {
-                // We need to fail any registered job activities upon an exception being thrown
-                _activities.ForEach( async x =>
-                {
-                    _activeJobManager.RemoveActivity( x );
-
-                    var job = FinalizedJob.Failure( x );
-                    _context.FinalizedJobs.Add( job );
-                    await _context.SaveChangesAsync( );
-                } );
-                throw;
-            }
-
-            // Complete all registered job activities
-            // TODO: replace with background event, find a way around hangfire's stupid serialization dogshit.
-            _activities.ForEach( async x =>
-            {
-                _activeJobManager.RemoveActivity( x );
-                var job = FinalizedJob.Success( x );
-                _context.FinalizedJobs.Add( job );
-                await _context.SaveChangesAsync( );
-            } );
-
+            await _onSuccess.Invoke( request );
+            
             return Success( );
         }
 

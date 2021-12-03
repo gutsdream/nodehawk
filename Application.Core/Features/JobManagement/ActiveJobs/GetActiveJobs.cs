@@ -17,16 +17,16 @@ namespace Application.Core.Features.JobManagement.ActiveJobs
 
     public class GetActiveJobsHandler : IRequestHandler<GetActiveJobs.Query, List<JobActivityDto>>
     {
-        private readonly ActiveJobManager _activeJobManager;
+        private readonly InMemoryActiveJobTracker _jobTracker;
 
-        public GetActiveJobsHandler( ActiveJobManager activeJobManager )
+        public GetActiveJobsHandler( InMemoryActiveJobTracker jobTracker )
         {
-            _activeJobManager = activeJobManager;
+            _jobTracker = jobTracker;
         }
 
         public async Task<List<JobActivityDto>> Handle( GetActiveJobs.Query request, CancellationToken cancellationToken )
         {
-            return _activeJobManager.JobActivities
+            return _jobTracker.JobActivities
                 .Select( x => new JobActivityDto( x ) )
                 .ToList( );
         }

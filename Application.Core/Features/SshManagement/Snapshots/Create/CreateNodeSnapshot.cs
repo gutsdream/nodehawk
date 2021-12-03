@@ -33,8 +33,7 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
     {
         public CreateNodeSnapshotHandler( DataContext repository, 
             INodeHawkSshClient nodeHawkSshClient, 
-            ActiveJobManager activeJobManager,
-            IEventManager eventManager )
+            TransientJobManagerFactory transientJobManagerFactory )
         {
             Validate( async x =>
             {
@@ -48,8 +47,6 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
                 return result;
             } );
             
-            UsingJobs( activeJobManager, repository );
-
             OnSuccessfulValidation( async x =>
             {
                 var node = await repository.Nodes
@@ -58,7 +55,9 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
                     .FirstAsync( n => n.Id == x.NodeId );
 
                 var activity = new Models.ActiveJobs.CreateNodeSnapshot( node );
-                RegisterActiveJob( activity );
+                
+                using var transientJobManager = transientJobManagerFactory.Create( );
+                transientJobManager.RegisterActiveJob( activity );
 
                 ConnectToNode( nodeHawkSshClient, activity, node );
 
@@ -67,7 +66,10 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
 
                 node.CreateSnapshot( spaceUsed, containerRunning );
 
+                throw new Exception( );
+
                 await repository.SaveChangesAsync( );
+                transientJobManager.MarkJobAsSuccess( activity );
             } );
         }
 

@@ -34,7 +34,7 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
     {
         public CleanNodeCommandHandler( DataContext repository,
             INodeHawkSshClient sshClient,
-            ActiveJobManager activeJobManager,
+            TransientJobManagerFactory transientJobManagerFactory,
             IEventManager eventManager )
         {
             Validate( async x =>
@@ -48,9 +48,7 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
 
                 return result;
             } );
-
-            UsingJobs( activeJobManager, repository );
-
+            
             // Thank u otnode.com <3
             OnSuccessfulValidation( async x =>
             {
@@ -59,7 +57,9 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
                     .FirstAsync( n => n.Id == x.NodeId );
 
                 var cleanNodeActivity = new Models.ActiveJobs.CleanNode( node );
-                RegisterActiveJob( cleanNodeActivity );
+                
+                using var transientJobManager = transientJobManagerFactory.Create( );
+                transientJobManager.RegisterActiveJob( cleanNodeActivity );
 
                 ConnectToNode( sshClient, cleanNodeActivity, node );
 
@@ -72,6 +72,7 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
                 node.AuditCleanup( );
 
                 await repository.SaveChangesAsync( );
+                transientJobManager.MarkJobAsSuccess( cleanNodeActivity );
 
                 eventManager.PublishEvent( new NodeCleanedEvent( node.Id ) );
             } );
