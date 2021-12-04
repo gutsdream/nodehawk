@@ -1,21 +1,21 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Core.Features.Nodes.Commands.Update;
+using Application.Core.Features.Nodes.Commands.Update.SshDetails;
 using Application.Core.Features.SshManagement.Snapshots.Create;
 using MediatR;
 
 namespace Application.Core.EventHandling.Nodes.Updated
 {
-    public class NodeUpdatedEventHandler : INotificationHandler<NodeUpdatedEvent>
+    public class NodeSshDetailsUpdatedEventHandler : INotificationHandler<NodeSshDetailsUpdatedEvent>
     {
         private readonly IMediator _mediator;
 
-        public NodeUpdatedEventHandler( IMediator mediator )
+        public NodeSshDetailsUpdatedEventHandler( IMediator mediator )
         {
             _mediator = mediator;
         }
 
-        public async Task Handle( NodeUpdatedEvent notification, CancellationToken cancellationToken )
+        public async Task Handle( NodeSshDetailsUpdatedEvent notification, CancellationToken cancellationToken )
         {
             await _mediator.Send( new CreateNodeSnapshot.Command { NodeId = notification.NodeId } );
         }

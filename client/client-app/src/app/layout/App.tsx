@@ -1,8 +1,9 @@
 import React, {Fragment, useEffect, useState} from 'react';
 import axios from "axios";
-import {Container, Header, List} from "semantic-ui-react";
-import {OtNode} from "../models/node";
+import {Container} from "semantic-ui-react";
+import {OtNode} from "../models/otnode";
 import NavBar from "./NavBar";
+import NodeDashboard from "../../features/nodes/dashboard/NodeDashboard";
 
 function App() {
     const [nodes, setNodes] = useState<OtNode[]>([]);
@@ -17,13 +18,7 @@ function App() {
         <Fragment>
             <NavBar/>
             <Container>
-                <List>
-                    {nodes.map(node => (
-                        <List.Item key={node.id}>
-                            {node.title}
-                        </List.Item>
-                    ))}
-                </List>
+                <NodeDashboard nodes={nodes}/>
             </Container>
         </Fragment>
     );

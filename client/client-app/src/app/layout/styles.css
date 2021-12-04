@@ -37,8 +37,30 @@ body {
 
 .navbar-grid-container{
   display: grid !important;
-  grid-template-columns: 20% 75% 5%;
+  grid-template-columns: 20% 65% 15%;
   padding: 0!important;
   margin: 0!important;
   width:100%;
+}
+.ui.modal>.header {
+  padding-left: 50px;
+}
+.form-segment{
+  padding-bottom:50px!important;
+  display: flex;
+  justify-content: center;
+  margin-right: auto!important;
+  margin-left: auto!important;
+  padding-left:50px!important;
+  padding-right:50px!important;
+}
+@media only screen and (min-width: 600px) {
+  .navbar-grid-container {
+    grid-template-columns: 20% 70% 10%;
+  }
+}
+@media only screen and (min-width: 768px) {
+  .navbar-grid-container {
+    grid-template-columns: 20% 75% 5%;
+  }
 }

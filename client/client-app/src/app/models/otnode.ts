@@ -8,4 +8,6 @@ export interface OtNode {
     lastBackupDateUtc: Date;
     lastCleanedDateUtc: Date;
     lastSnapshotDateUtc: Date;
+    createdDateUtc: Date;
+    minutesSinceLastSnapshot: number;
 }

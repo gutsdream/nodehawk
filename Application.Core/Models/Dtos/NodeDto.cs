@@ -16,8 +16,10 @@ namespace Application.Core.Models.Dtos
         public DateTime? LastBackupDateUtc { get; }
         public DateTime? LastCleanedDateUtc { get; }
         public DateTime? LastSnapshotDateUtc { get; }
+        public DateTime CreatedDateUtc { get; }
         
-        
+        public int? MinutesSinceLastSnapshot { get; }
+
         public NodeDto( Node node )
         {
             Id = node.Id;
@@ -31,6 +33,13 @@ namespace Application.Core.Models.Dtos
             LastBackupDateUtc = node.LastBackupDateUtc;
             LastCleanedDateUtc = node.LastCleanedDateUtc;
             LastSnapshotDateUtc = node.LastSnapshotDateUtc;
+            CreatedDateUtc = node.CreatedDateUtc;
+
+            if ( LastSnapshotDateUtc != null )
+            {
+                TimeSpan timeSinceLastSnapshot = DateTime.UtcNow - (DateTime)LastSnapshotDateUtc;
+                MinutesSinceLastSnapshot = (int)Math.Round(timeSinceLastSnapshot.TotalMinutes);
+            }
         }
     }
 }

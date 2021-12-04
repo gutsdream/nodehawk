@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.JobManagement;
-using Domain.Interfaces;
 using MediatR;
 
 namespace Application.Core.Features.JobManagement.ActiveJobs

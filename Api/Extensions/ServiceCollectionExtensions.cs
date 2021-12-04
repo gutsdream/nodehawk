@@ -10,8 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Application.Core.Persistence;
-using Application.Core.Shared;
-using Application.Core.Shared.Interfaces;
 using Newtonsoft.Json;
 using Scheduler;
 using Scheduler.SnapshotScheduler;

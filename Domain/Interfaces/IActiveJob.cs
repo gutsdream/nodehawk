@@ -1,5 +1,4 @@
 using System;
-using Application.Core.Shared.Interfaces;
 
 namespace Domain.Interfaces
 {

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Domain.Entities;
 using Domain.Interfaces;
 
 namespace Application.Core.JobManagement

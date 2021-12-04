@@ -1,15 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Core.Interfaces;
-using Application.Core.JobManagement;
 using Application.Core.Models.Requests;
 using Application.Core.Models.Results;
-using Application.Core.Persistence;
 using Domain.ExceptionHandling;
-using Domain.Interfaces;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;

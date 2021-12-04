@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Application.Core.Features.Nodes.Commands.Update;
+using Application.Core.Features.Nodes.Commands.Update.Details;
 using Domain.Entities;
 using Application.Core.Persistence;
 using Application.Testing.Mocks;
@@ -10,14 +10,14 @@ using Xunit;
 
 namespace Application.Testing.Tests.CommandHandling.Nodes
 {
-    public class UpdateNodeHandlerTests
+    public class UpdateNodeDetailsHandlerTests
     {
-        private UpdateNodeHandler _updateNodeHandler;
+        private UpdateNodeDetails.UpdateNodeDetailsHandler _updateNodeDetailsHandler;
 
         private readonly EventManagerMock _eventManagerMock;
         private DataContext _context;
 
-        public UpdateNodeHandlerTests( )
+        public UpdateNodeDetailsHandlerTests( )
         {
             _eventManagerMock = new EventManagerMock( );
 
@@ -31,22 +31,18 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             
             var guid = await GivenIdOfNodeIdInRepository( );
             const string title = "Node One";
-            var command = new UpdateNode.Command
+            var command = new UpdateNodeDetails.Command
             {
                 NodeId = guid,
                 Title = title,
-                ExternalId = null,
-                Host = "host",
-                Username = "username",
-                Key = "superSecretPassword"
+                ExternalId = null
             };
 
             // When
-            var result = await _updateNodeHandler.Handle( command, new CancellationToken( ) );
+            var result = await _updateNodeDetailsHandler.Handle( command, new CancellationToken( ) );
 
             // Then
             Assert.True( result.IsSuccessful );
-            Assert.True( _eventManagerMock.ContainsRequestType<NodeUpdatedEvent>( ) );
         }
 
         [Fact]
@@ -55,18 +51,15 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             // Given
             GivenFreshHandler( );
             
-            var command = new UpdateNode.Command
+            var command = new UpdateNodeDetails.Command
             {
                 NodeId = default,
                 Title = "Node One",
-                ExternalId = null,
-                Host = "host",
-                Username = "username",
-                Key = "superSecretPassword"
+                ExternalId = null
             };
 
             // When
-            var result = await _updateNodeHandler.Handle( command, new CancellationToken( ) );
+            var result = await _updateNodeDetailsHandler.Handle( command, new CancellationToken( ) );
 
             // Then
             Assert.False( result.IsSuccessful );
@@ -82,18 +75,15 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             GivenFreshHandler( );
             
             var guid = await GivenIdOfNodeIdInRepository( );
-            var command = new UpdateNode.Command
+            var command = new UpdateNodeDetails.Command
             {
                 NodeId = guid,
                 Title = title,
-                ExternalId = null,
-                Host = "host",
-                Username = "username",
-                Key = "superSecretPassword"
+                ExternalId = null
             };
 
             // When
-            var result = await _updateNodeHandler.Handle( command, new CancellationToken( ) );
+            var result = await _updateNodeDetailsHandler.Handle( command, new CancellationToken( ) );
 
             // Then
             Assert.False( result.IsSuccessful );
@@ -107,18 +97,15 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             GivenFreshHandler( );
             
             var guid = await GivenIdOfNodeIdInRepository( );
-            var command = new UpdateNode.Command
+            var command = new UpdateNodeDetails.Command
             {
                 NodeId = guid,
                 Title = "Node One",
-                ExternalId = null,
-                Host = "host",
-                Username = "username",
-                Key = "superSecretPassword"
+                ExternalId = null
             };
 
             // When
-            var result = await _updateNodeHandler.Handle( command, new CancellationToken( ) );
+            var result = await _updateNodeDetailsHandler.Handle( command, new CancellationToken( ) );
 
             // Then
             Assert.True( result.IsSuccessful );
@@ -132,18 +119,15 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             
             var guid = await GivenIdOfNodeIdInRepository( );
             var externalId = new string( 'a', 40 );
-            var command = new UpdateNode.Command
+            var command = new UpdateNodeDetails.Command
             {
                 NodeId = guid,
                 Title = "Node One",
                 ExternalId = externalId,
-                Host = "host",
-                Username = "username",
-                Key = "superSecretPassword"
             };
 
             // When
-            var result = await _updateNodeHandler.Handle( command, new CancellationToken( ) );
+            var result = await _updateNodeDetailsHandler.Handle( command, new CancellationToken( ) );
 
             // Then
             Assert.True( result.IsSuccessful );
@@ -160,18 +144,15 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             
             var guid = await GivenIdOfNodeIdInRepository( );
             var externalId = new string( 'a', characterLength );
-            var command = new UpdateNode.Command
+            var command = new UpdateNodeDetails.Command
             {
                 NodeId = guid,
                 Title = "Node One",
-                ExternalId = externalId,
-                Host = "host",
-                Username = "username",
-                Key = "superSecretPassword"
+                ExternalId = externalId
             };
 
             // When
-            var result = await _updateNodeHandler.Handle( command, new CancellationToken( ) );
+            var result = await _updateNodeDetailsHandler.Handle( command, new CancellationToken( ) );
 
             // Then
             Assert.False( result.IsSuccessful );
@@ -180,110 +161,26 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
                 $"'External Id' must be 40 characters in length. You entered {characterLength} characters." );
         }
 
-        [Theory]
-        [InlineData( null )]
-        [InlineData( "" )]
-        public async Task Should_ReturnFailure_WhenCommandHostIsNullOrEmpty( string host )
-        {
-            // Given
-            GivenFreshHandler( );
-            
-            var guid = await GivenIdOfNodeIdInRepository( );
-            var command = new UpdateNode.Command
-            {
-                NodeId = guid,
-                Title = "Node One",
-                ExternalId = null,
-                Host = host,
-                Username = "username",
-                Key = "superSecretPassword"
-            };
-
-            // When
-            var result = await _updateNodeHandler.Handle( command, new CancellationToken( ) );
-
-            // Then
-            Assert.False( result.IsSuccessful );
-            Then.ResultContainsError( result, nameof( command.Host ), $"'{nameof( command.Host )}' must not be empty." );
-        }
-
-        [Theory]
-        [InlineData( null )]
-        [InlineData( "" )]
-        public async Task Should_ReturnFailure_WhenCommandUsernameIsNullOrEmpty( string username )
-        {
-            // Given
-            GivenFreshHandler( );
-            
-            var guid = await GivenIdOfNodeIdInRepository( );
-            var command = new UpdateNode.Command
-            {
-                NodeId = guid,
-                Title = "Node One",
-                ExternalId = null,
-                Host = "host",
-                Username = username,
-                Key = "superSecretPassword"
-            };
-
-            // When
-            var result = await _updateNodeHandler.Handle( command, new CancellationToken( ) );
-
-            // Then
-            Assert.False( result.IsSuccessful );
-            Then.ResultContainsError( result, nameof( command.Username ), $"'{nameof( command.Username )}' must not be empty." );
-        }
-
-        [Theory]
-        [InlineData( null )]
-        [InlineData( "" )]
-        public async Task Should_ReturnFailure_WhenCommandKeyIsNullOrEmpty( string key )
-        {
-            // Given
-            GivenFreshHandler( );
-            
-            var guid = await GivenIdOfNodeIdInRepository( );
-            var command = new UpdateNode.Command
-            {
-                NodeId = guid,
-                Title = "Node One",
-                ExternalId = null,
-                Host = "host",
-                Username = "username",
-                Key = key
-            };
-
-            // When
-            var result = await _updateNodeHandler.Handle( command, new CancellationToken( ) );
-
-            // Then
-            Assert.False( result.IsSuccessful );
-            Then.ResultContainsError( result, nameof( command.Key ), $"'{nameof( command.Key )}' must not be empty." );
-        }
-        
         [Fact]
         public async Task Should_ReturnFailure_When_NodeIdDoesNotMatchExistingNode( )
         {
             // Given
             GivenFreshHandler( );
-            GivenIdOfNodeIdInRepository( );
+            await GivenIdOfNodeIdInRepository( );
             
             var guid = Guid.NewGuid( );
-            var command = new UpdateNode.Command
+            var command = new UpdateNodeDetails.Command
             {
                 NodeId = guid,
                 Title = "Node One",
                 ExternalId = null,
-                Host = "host",
-                Username = "username",
-                Key = "superSecretPassword"
             };
 
             _context.Nodes.Add( UpdateNodeFromCommand( command ) );
             await _context.SaveChangesAsync( );
 
             // When
-            var result = await _updateNodeHandler.Handle( command, new CancellationToken( ) );
+            var result = await _updateNodeDetailsHandler.Handle( command, new CancellationToken( ) );
 
             // Then
             Assert.False( result.IsSuccessful );
@@ -298,21 +195,18 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             
             var guid = await GivenIdOfNodeIdInRepository( );
             const string title = "Node One";
-            var command = new UpdateNode.Command
+            var command = new UpdateNodeDetails.Command
             {
                 NodeId = guid,
                 Title = "Node One",
                 ExternalId = null,
-                Host = "host",
-                Username = "username",
-                Key = "superSecretPassword"
             };
 
             _context.Nodes.Add( UpdateNodeFromCommand( command ) );
             await _context.SaveChangesAsync( );
 
             // When
-            var result = await _updateNodeHandler.Handle( command, new CancellationToken( ) );
+            var result = await _updateNodeDetailsHandler.Handle( command, new CancellationToken( ) );
 
             // Then
             Assert.False( result.IsSuccessful );
@@ -327,14 +221,11 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             
             var guid = await GivenIdOfNodeIdInRepository( );
             const string externalId = "7cda80c35418f07543fae216cad224ea46dd11eb";
-            var command = new UpdateNode.Command
+            var command = new UpdateNodeDetails.Command
             {
                 NodeId = guid,
                 Title = "Node One",
-                ExternalId = externalId,
-                Host = "host",
-                Username = "username",
-                Key = "superSecretPassword"
+                ExternalId = externalId
             };
 
             _context.Nodes.Add( UpdateNodeFromCommand( command ) );
@@ -343,16 +234,16 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             command.Title = "unique title";
 
             // When
-            var result = await _updateNodeHandler.Handle( command, new CancellationToken( ) );
+            var result = await _updateNodeDetailsHandler.Handle( command, new CancellationToken( ) );
 
             // Then
             Assert.False( result.IsSuccessful );
             Then.ResultContainsError( result, nameof( command.ExternalId ), $"Different node with {nameof( Node.ExternalId )} '{externalId}' already exists." );
         }
 
-        private static Node UpdateNodeFromCommand( UpdateNode.Command command )
+        private static Node UpdateNodeFromCommand( UpdateNodeDetails.Command command )
         {
-            return new Node( command.Title, new ConnectionDetails( command.Host, command.Username, command.Key ), command.ExternalId );
+            return new Node( command.Title, new ConnectionDetails( "host", "user", "key" ), command.ExternalId );
         }
 
         private async Task<Guid> GivenIdOfNodeIdInRepository( )
@@ -366,12 +257,9 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         
         private void GivenFreshHandler( )
         {
-            var cypherServiceMock = new CypherServiceMock( );
-
             _context = TestData.Create.UniqueContext( );
 
-            _updateNodeHandler = new UpdateNodeHandler( _context,
-                cypherServiceMock.Object,
+            _updateNodeDetailsHandler = new UpdateNodeDetails.UpdateNodeDetailsHandler( _context,
                 _eventManagerMock.Object );
         }
     }

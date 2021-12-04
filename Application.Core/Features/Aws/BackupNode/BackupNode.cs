@@ -14,7 +14,6 @@ using Domain.Entities;
 using FluentValidation;
 using FluentValidation.Results;
 using Application.Core.Shared;
-using Application.Core.Shared.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Core.Features.Aws.BackupNode

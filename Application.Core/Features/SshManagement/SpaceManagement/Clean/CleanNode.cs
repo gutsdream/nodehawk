@@ -6,7 +6,6 @@ using Application.Core.JobManagement;
 using Application.Core.Models.Requests;
 using Application.Core.Persistence;
 using Application.Core.Shared;
-using Application.Core.Shared.Interfaces;
 using Domain.Entities;
 using FluentValidation;
 using FluentValidation.Results;
