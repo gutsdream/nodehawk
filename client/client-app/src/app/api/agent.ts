@@ -3,6 +3,7 @@ import {OtNode} from "../models/otnode";
 import {NodeGeneralDetails} from "../models/update-node-details";
 import {NodeSshDetails} from "../models/update-node-ssh-details";
 import {NodeRequest} from "../models/node-request";
+import {CreateNodeRequest} from "../models/create-node";
 
 const sleep = (delay: number) =>{
     return new Promise((resolve) => {
@@ -34,12 +35,12 @@ const requests = {
 const Nodes ={
     list: ()=> requests.get<OtNode[]>('nodes/GetNodes'),
     details: (id: string)=> requests.get<OtNode[]>(`nodes/GetNode/${id}`),
-    create: (node: OtNode)=> requests.post<OtNode[]>('nodes/Create', node),
-    updateGeneral: (details: NodeGeneralDetails)=> requests.post<OtNode[]>('nodes/UpdateGeneralDetails', details),
-    updateSsh: (details: NodeSshDetails)=> requests.post<OtNode[]>('nodes/UpdateSshDetails', details),
-    delete: (request: NodeRequest)=> requests.post<NodeRequest>('nodes/Delete', request),
-    refresh: (request: NodeRequest)=> requests.post<NodeRequest>('nodes/CreateSnapshot', request),
-    clean: (request: NodeRequest)=> requests.post<NodeRequest>('nodes/Clean', request)
+    create: (node: CreateNodeRequest)=> requests.post<CreateNodeRequest>('nodes/Create', node),
+    updateGeneral: (details: NodeGeneralDetails)=> requests.post<void>('nodes/UpdateGeneralDetails', details),
+    updateSsh: (details: NodeSshDetails)=> requests.post<void>('nodes/UpdateSshDetails', details),
+    delete: (request: NodeRequest)=> requests.post<void>('nodes/Delete', request),
+    refresh: (request: NodeRequest)=> requests.post<void>('nodes/CreateSnapshot', request),
+    clean: (request: NodeRequest)=> requests.post<void>('nodes/Clean', request)
 }
 
 const Aws ={

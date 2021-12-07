@@ -6,6 +6,8 @@ import NodeDashboard from "../../features/nodes/dashboard/NodeDashboard";
 import agent from "../api/agent";
 import LoadingComponent from "./LoadingComponent";
 import {NodeGeneralDetails} from "../models/update-node-details";
+import {NodeRequest} from "../models/node-request";
+import {CreateNodeRequest} from "../models/create-node";
 
 function App() {
     const [nodes, setNodes] = useState<OtNode[]>([]);
@@ -15,11 +17,15 @@ function App() {
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
+        refreshNodes();
+    }, []);
+
+    function refreshNodes() {
         agent.Nodes.list().then(x => {
             setNodes(x);
             setLoading(false);
         })
-    }, []);
+    }
 
     function viewNode(id: string) {
         setNode(nodes.find(x => x.id === id));
@@ -48,7 +54,6 @@ function App() {
     }
 
     function handleEditNode(nodeGeneralDetails: NodeGeneralDetails) {
-        console.log(nodeGeneralDetails);
         setSubmitting(true);
         agent.Nodes.updateGeneral(nodeGeneralDetails).then(() => {
             let node = nodes.find(x => x.id === nodeGeneralDetails.nodeId);
@@ -59,7 +64,27 @@ function App() {
             }
 
             setSubmitting(false);
-        }).catch(()=>{
+        }).catch(() => {
+            setSubmitting(false);
+        });
+    }
+
+    function handleCreateNode(createNodeRequest: CreateNodeRequest) {
+        setSubmitting(true);
+        agent.Nodes.create(createNodeRequest).then(() => {
+            refreshNodes();
+            setSubmitting(false);
+        }).catch(() => {
+            setSubmitting(false);
+        });
+    }
+
+    function handleDeleteNode(nodeRequest: NodeRequest) {
+        setSubmitting(true);
+        agent.Nodes.delete(nodeRequest).then(() => {
+            setNodes(nodes.filter(x => x.id !== nodeRequest.nodeId))
+            setSubmitting(false);
+        }).catch(() => {
             setSubmitting(false);
         });
     }
@@ -77,8 +102,10 @@ function App() {
                                bulkToggle={bulkToggle}
                                viewNode={viewNode}
                                cancelViewNode={cancelViewNode}
-                               handleEditNode={handleEditNode} 
-                               submitting={submitting}/>
+                               handleEditNode={handleEditNode}
+                               submitting={submitting}
+                               handleCreateNode={handleCreateNode}
+                handleDeleteNode={handleDeleteNode}/>
             </Container>
         </Fragment>
     );

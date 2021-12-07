@@ -98,13 +98,10 @@ export default function EditNodeModal({node, handleEditNode, submitting}: Props)
     function getSshForm() {
         function handleSubmit() {
             sshIsSubmitting(true);
-            console.log(sshSubmitting);
             agent.Nodes.updateSsh(nodeSshDetails).then(()=>{
                 sshIsSubmitting(false);
-                console.log(sshSubmitting);
             }).catch(()=>{
                 sshIsSubmitting(false);
-                console.log(sshSubmitting);
             });
         }
 

@@ -2,15 +2,18 @@ import React from "react";
 import {OtNode} from "../../../app/models/otnode";
 import {Button, Checkbox, Item, Segment} from "semantic-ui-react";
 import NodeToggle from "./NodeToggle";
+import {NodeRequest} from "../../../app/models/node-request";
 
 interface Props {
     nodes: OtNode[]
     selectedNodes: string[]
     selectNode : (id: string) => void;
     viewNode : (id: string) => void
+    handleDeleteNode: (request: NodeRequest) => void;
+    submitting : boolean;
 }
 
-export default function NodeList({nodes, selectNode, viewNode, selectedNodes}: Props) {
+export default function NodeList({nodes, selectNode, viewNode, selectedNodes, handleDeleteNode, submitting}: Props) {
     return (
         <Segment>
             <Item.Group divided>
@@ -25,6 +28,12 @@ export default function NodeList({nodes, selectNode, viewNode, selectedNodes}: P
                             {getItemDescription(node)}
                             <Item.Extra>
                                 <Button floated='right' content='More' color='blue' onClick={()=>viewNode(node.id)}/>
+                                <Button floated='right' content='Delete' color='red' onClick={()=>{
+                                    var request : NodeRequest = {
+                                        nodeId : node.id
+                                    }
+                                    handleDeleteNode(request);
+                                }} disabled={submitting} loading={submitting}/>
                                 <div>Node details last updated {node.minutesSinceLastSnapshot === 0 || node.minutesSinceLastSnapshot === 1
                                     ? 'just now' 
                                     : node.minutesSinceLastSnapshot + ' minutes ago'}</div>
