@@ -39,7 +39,10 @@ namespace Application.Core.Features.Nodes.Commands.Update.SshDetails
 
     public class UpdateNodeSshDetailsHandler : ValidatableCommandHandler<UpdateNodeSshDetails.Command, UpdateNodeSshDetails.Command.Validator>
     {
-        public UpdateNodeSshDetailsHandler( DataContext repository, ICypherService cypherService, IEventManager eventManager )
+        public UpdateNodeSshDetailsHandler( DataContext repository, 
+            ICypherService cypherService, 
+            IEventManager eventManager,
+            INodeHawkSshClient sshClient )
         {
             Validate( async x =>
             {
@@ -48,6 +51,11 @@ namespace Application.Core.Features.Nodes.Commands.Update.SshDetails
                 if ( !await repository.Nodes.AnyAsync( n => n.Id == x.NodeId ) )
                 {
                     result.AddError( nameof( x.NodeId ), $"A node with {nameof( Node.Id )} '{x.NodeId}' was not found." );
+                }
+                
+                if ( !sshClient.AreConnectionDetailsValid( x.Host, x.Username, x.Key ) )
+                {
+                    result.AddError( "SshDetails", "Could not verify authenticity of provided SSH connection details. Please ensure you have entered them correctly." );
                 }
 
                 return result;

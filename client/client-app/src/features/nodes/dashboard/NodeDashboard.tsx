@@ -1,39 +1,34 @@
 import React, {useState} from "react";
-import {Grid, Select} from "semantic-ui-react";
+import {Button, Grid} from "semantic-ui-react";
 import {OtNode} from "../../../app/models/otnode";
 import NodeList from "./NodeList";
 import NodeDetails from "../details/NodeDetails";
 import CreateNodeModal from "../create/CreateNodeModal";
 import NodeBulkActions from "./NodeBulkActions";
+import {NodeGeneralDetails} from "../../../app/models/update-node-details";
 
 interface Props {
     nodes: OtNode[]
+    node: OtNode | undefined
+    selectedNodesForBulk : string[]
+    selectNode : (id: string) => void;
+    bulkToggle : () => void;
+    viewNode : (id: string) => void;
+    cancelViewNode : () => void;
+    handleEditNode: (details : NodeGeneralDetails)=> void;
+    submitting : boolean;
 }
 
-export default function NodeDashboard({nodes}: Props) {
-    const [node, setNode] = useState(null);
-    const [selectedNodes, setSelectedNodes] = useState<OtNode[]>(new Array<OtNode>());
-
-    function selectNode(node: OtNode) {
-        if (selectedNodes.includes(node)) {
-            console.log('unchecked');
-            var nodes = selectedNodes.filter(x => x != node);
-            setSelectedNodes(nodes);
-        } else {
-            console.log('checked');
-            var nodes = selectedNodes.concat(node);
-            setSelectedNodes(nodes);
-        }
-    }
-    
-    return (<Grid>
+export default function NodeDashboard({nodes, node, selectedNodesForBulk, bulkToggle, viewNode, cancelViewNode, selectNode, handleEditNode, submitting}: Props) {
+        return (<Grid>
         <Grid.Column width='10'>
             <CreateNodeModal/>
-            <NodeBulkActions selectedNodes={selectedNodes}/>
-            <NodeList nodes={nodes} selectNode={selectNode}/>
+            <NodeBulkActions selectedNodes={selectedNodesForBulk}/>
+            <Button onClick={()=>bulkToggle()} content='Select All' style={{backgroundColor: 'white', float:'right'}}/>
+            <NodeList nodes={nodes} selectNode={selectNode} viewNode={viewNode} selectedNodes={selectedNodesForBulk}/>
         </Grid.Column>
         <Grid.Column width='6'>
-            {nodes[0]&&<NodeDetails node={nodes[0]}/>}
+            {node&&<NodeDetails node={node} cancelViewNode={cancelViewNode} handleEditNode={handleEditNode} submitting={submitting}/>}
         </Grid.Column>
     </Grid>)
 }

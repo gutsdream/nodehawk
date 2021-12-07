@@ -13,14 +13,15 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
     public class UpdateNodeSshDetailsHandlerTests
     {
         private UpdateNodeSshDetailsHandler _updateNodeSshDetailsHandler;
+        private DataContext _context;
 
         private readonly EventManagerMock _eventManagerMock;
-        private DataContext _context;
+        private readonly NodeHawkSshClientMock _sshClientMock;
 
         public UpdateNodeSshDetailsHandlerTests( )
         {
             _eventManagerMock = new EventManagerMock( );
-
+            _sshClientMock = new NodeHawkSshClientMock( );
         }
         
         [Fact]
@@ -169,6 +170,30 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             Assert.False( result.IsSuccessful );
             Then.ResultContainsError( result, nameof( command.NodeId ), $"A node with {nameof( Node.Id )} '{guid}' was not found.");
         }
+        
+        [Fact]
+        public async Task Should_ReturnFailure_When_SshAuthenticationFails( )
+        {
+            // Given
+            _sshClientMock.SshAuthenticationShouldFail();
+            GivenFreshHandler( );
+            var guid = await GivenIdOfNodeIdInRepository( );
+            
+            var command = new UpdateNodeSshDetails.Command
+            {
+                NodeId = guid,
+                Host = "host",
+                Username = "username",
+                Key = "superSecretPassword"
+            };
+
+            // When
+            var result = await _updateNodeSshDetailsHandler.Handle( command, new CancellationToken( ) );
+
+            // Then
+            Assert.False( result.IsSuccessful );
+            Then.ResultContainsError( result, "SshDetails", "Could not verify authenticity of provided SSH connection details. Please ensure you have entered them correctly."  );
+        }
 
         private static Node UpdateNodeFromCommand( UpdateNodeSshDetails.Command command )
         {
@@ -192,7 +217,8 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
 
             _updateNodeSshDetailsHandler = new UpdateNodeSshDetailsHandler( _context,
                 cypherServiceMock.Object,
-                _eventManagerMock.Object );
+                _eventManagerMock.Object,
+                _sshClientMock.Object );
         }
     }
 }

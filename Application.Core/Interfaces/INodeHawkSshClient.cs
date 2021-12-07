@@ -9,6 +9,8 @@ namespace Application.Core.Interfaces
         void ConnectToNode( Node node );
         ISshCommandResult Run( SshMessage nodeHawkSshSshMessage );
         ISshCommandResult Run( List<SshMessage> nodeHawkSshMessage );
+        
+        bool AreConnectionDetailsValid( string host, string username, string key );
     }
     
     public class SshMessage

@@ -3,7 +3,7 @@ import React from "react";
 import {OtNode} from "../../../app/models/otnode";
 
 interface Props {
-    selectedNodes: OtNode[]
+    selectedNodes: string[]
 }
 
 export default function NodeBulkActions({selectedNodes}: Props) {

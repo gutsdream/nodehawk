@@ -7,12 +7,12 @@ using Renci.SshNet;
 
 namespace Infrastructure.Ssh
 {
-    public class NodeHawkNodeHawkSshClient : INodeHawkSshClient, IDisposable
+    public class NodeHawkSshClient : INodeHawkSshClient, IDisposable
     {
         private readonly ICypherService _cypherService;
         private SshClient _sshClient;
 
-        public NodeHawkNodeHawkSshClient( ICypherService cypherService )
+        public NodeHawkSshClient( ICypherService cypherService )
         {
             _cypherService = cypherService;
         }
@@ -50,6 +50,21 @@ namespace Infrastructure.Ssh
 
             // We usually only really care about the final command, the others are usually just preconditions
             return new SshCommandResult( commands.Last( ) );
+        }
+
+        public bool AreConnectionDetailsValid( string host, string username, string key )
+        {
+            _sshClient = new SshClient( host, username, key );
+            try
+            {
+                _sshClient.Connect();
+            }
+            catch ( Exception )
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public void Dispose( )

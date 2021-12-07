@@ -25,7 +25,7 @@ namespace Api.Extensions
             services.AddDataProtection( );
 
             services.AddSingleton<ICypherService, CypherService>( );
-            services.AddScoped<INodeHawkSshClient, NodeHawkNodeHawkSshClient>( );
+            services.AddScoped<INodeHawkSshClient, NodeHawkSshClient>( );
 
             services.AddMediatR( typeof( NodeListQueryHandler ).Assembly );
 

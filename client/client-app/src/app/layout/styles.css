@@ -25,7 +25,7 @@ body {
   text-align: center;
 }
 
-.ui.menu .item>i.sync.alternate.icon {
+.ui.menu .item>i.job-icon {
   margin-right:0px;
   margin-left:auto;
 }
@@ -46,7 +46,6 @@ body {
   padding-left: 50px;
 }
 .form-segment{
-  padding-bottom:50px!important;
   display: flex;
   justify-content: center;
   margin-right: auto!important;
@@ -54,6 +53,11 @@ body {
   padding-left:50px!important;
   padding-right:50px!important;
 }
+
+.general-form{
+  width:100%;
+}
+
 @media only screen and (min-width: 600px) {
   .navbar-grid-container {
     grid-template-columns: 20% 70% 10%;

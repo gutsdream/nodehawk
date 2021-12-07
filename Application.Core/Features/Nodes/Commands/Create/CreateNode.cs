@@ -41,7 +41,10 @@ namespace Application.Core.Features.Nodes.Commands.Create
 
     public class CreateNodeHandler : ValidatableCommandHandler<CreateNode.Command, CreateNode.Command.Validator>
     {
-        public CreateNodeHandler( DataContext repository, ICypherService cypherService, IEventManager eventManager )
+        public CreateNodeHandler( DataContext repository, 
+            ICypherService cypherService, 
+            IEventManager eventManager,
+            INodeHawkSshClient sshClient )
         {
             Validate( async x =>
             {
@@ -55,6 +58,11 @@ namespace Application.Core.Features.Nodes.Commands.Create
                 if ( x.ExternalId != null && await repository.Nodes.AnyAsync( n => n.ExternalId == x.ExternalId ) )
                 {
                     result.AddError( nameof( x.ExternalId ), $"Node with {nameof( Node.ExternalId )} '{x.ExternalId}' already exists." );
+                }
+
+                if ( !sshClient.AreConnectionDetailsValid( x.Host, x.Username, x.Key ) )
+                {
+                    result.AddError( "SshDetails", "Could not verify authenticity of provided SSH connection details. Please ensure you have entered them correctly." );
                 }
 
                 return result;

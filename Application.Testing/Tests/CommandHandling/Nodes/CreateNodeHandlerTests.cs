@@ -16,10 +16,12 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         private DataContext _context;
         
         private readonly EventManagerMock _eventManagerMock;
+        private readonly NodeHawkSshClientMock _sshClientMock;
 
         public CreateNodeHandlerTests( )
         {
             _eventManagerMock = new EventManagerMock( );
+            _sshClientMock = new NodeHawkSshClientMock( );
         }
 
         [Fact]
@@ -276,6 +278,30 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             Assert.False( result.IsSuccessful );
             Then.ResultContainsError( result, nameof( command.ExternalId ), $"Node with {nameof( Node.ExternalId )} '{externalId}' already exists." );
         }
+        
+        [Fact]
+        public async Task Should_ReturnFailure_When_SshAuthenticationFails( )
+        {
+            // Given
+            _sshClientMock.SshAuthenticationShouldFail();
+            GivenFreshHandler( );
+            
+            var command = new CreateNode.Command
+            {
+                Title = "Node One",
+                ExternalId = null,
+                Host = "host",
+                Username = "username",
+                Key = "superSecretPassword"
+            };
+
+            // When
+            var result = await _createNodeHandler.Handle( command, new CancellationToken( ) );
+
+            // Then
+            Assert.False( result.IsSuccessful );
+            Then.ResultContainsError( result, "SshDetails", "Could not verify authenticity of provided SSH connection details. Please ensure you have entered them correctly."  );
+        }
 
         private static Node CreateNodeFromCommand( CreateNode.Command command )
         {
@@ -288,7 +314,8 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
 
             _createNodeHandler = new CreateNodeHandler( _context,
                 new CypherServiceMock( ).Object,
-                _eventManagerMock.Object );
+                _eventManagerMock.Object,
+                _sshClientMock.Object );
             
         }
     }

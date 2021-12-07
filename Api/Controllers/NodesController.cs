@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Application.Core.Features.Nodes.Commands.Create;
 using Application.Core.Features.Nodes.Commands.Delete;
+using Application.Core.Features.Nodes.Commands.Update.Details;
 using Application.Core.Features.Nodes.Commands.Update.SshDetails;
 using Application.Core.Features.Nodes.Queries.NodeDetails;
 using Application.Core.Features.Nodes.Queries.NodeList;
@@ -37,9 +38,15 @@ namespace Api.Controllers
         {
             return Evaluate( await Mediator.Send( createNodeCommand ) );
         }
+        
+        [HttpPost]
+        public async Task<IActionResult> UpdateGeneralDetails( UpdateNodeDetails.Command updateNodeCommand )
+        {
+            return Evaluate( await Mediator.Send( updateNodeCommand ) );
+        }
 
         [HttpPost]
-        public async Task<IActionResult> Update( UpdateNodeSshDetails.Command updateNodeCommand )
+        public async Task<IActionResult> UpdateSshDetails( UpdateNodeSshDetails.Command updateNodeCommand )
         {
             return Evaluate( await Mediator.Send( updateNodeCommand ) );
         }

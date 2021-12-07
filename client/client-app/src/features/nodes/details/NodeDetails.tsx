@@ -2,12 +2,16 @@ import React from "react";
 import {Button, Card, Icon} from "semantic-ui-react";
 import {OtNode} from "../../../app/models/otnode";
 import EditNodeModal from "../edit/EditNodeModal";
+import {NodeGeneralDetails} from "../../../app/models/update-node-details";
 
 interface Props {
-    node: OtNode
+    node: OtNode,
+    cancelViewNode: () => void;
+    handleEditNode: (details : NodeGeneralDetails)=> void;
+    submitting: boolean;
 }
 
-export default function NodeDetails({node}: Props) {
+export default function NodeDetails({node, cancelViewNode, handleEditNode, submitting}: Props) {
     return (
         <Card fluid>
             <Card.Content>
@@ -32,8 +36,8 @@ export default function NodeDetails({node}: Props) {
                     </i>
                     <br/>
                     <Button.Group widths='2'>
-                        <Button basic content='Remove' color='red'/>
-                        <Button as={EditNodeModal} node={node}/>
+                        <Button basic onClick={cancelViewNode} content='Close' color='grey'/>
+                        <Button as={EditNodeModal} node={node} handleEditNode={handleEditNode} submitting={submitting}/>
                     </Button.Group>
                 </Card.Content>
             </Card.Content>

@@ -11,7 +11,7 @@ export default function NavBar() {
                         nodehawk
                     </Menu.Item>
                     <Menu.Item>
-                        <i className="sync alternate icon"/>
+                        <i className="paper plane icon job-icon"/>
                     </Menu.Item>
                     <Menu.Item>
                         <i className="setting icon"/>
