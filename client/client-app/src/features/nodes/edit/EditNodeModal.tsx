@@ -1,17 +1,16 @@
-import {Button, Form, FormProps, Menu, Modal, Segment} from "semantic-ui-react";
-import React, {ChangeEvent, FormEvent, useState} from "react";
+import {Button, Form, Menu, Modal, Segment} from "semantic-ui-react";
+import React, {ChangeEvent, useState} from "react";
 import {OtNode} from "../../../app/models/otnode";
 import {NodeGeneralDetails} from "../../../app/models/update-node-details";
 import {NodeSshDetails} from "../../../app/models/update-node-ssh-details";
 import agent from "../../../app/api/agent";
+import {useStore} from "../../../app/stores/store";
+import {observer} from "mobx-react-lite";
 
-interface Props {
-    node: OtNode
-    handleEditNode: (details : NodeGeneralDetails)=> void;
-    submitting : boolean;
-}
-
-export default function EditNodeModal({node, handleEditNode, submitting}: Props) {
+function EditNodeModal() {
+    const {nodeStore} = useStore();
+    const {nodeUnderView, handleEditNode, submitting} = nodeStore;
+    
     const generalMenu = 'general';
     const sshDetailsMenu = 'ssh details';
 
@@ -19,15 +18,15 @@ export default function EditNodeModal({node, handleEditNode, submitting}: Props)
     const [open, setOpen] = React.useState(false);
 
     const initialGeneralDetails : NodeGeneralDetails = {
-        nodeId: node.id,
-        title: node.title,
-        externalId: node.externalId
+        nodeId: nodeUnderView!.id,
+        title: nodeUnderView!.title,
+        externalId: nodeUnderView!.externalId
     }
 
     const [nodeGeneralDetails, setNodeGeneralDetails] = useState(initialGeneralDetails);
 
     const initialSshDetails : NodeSshDetails = {
-        nodeId: node.id,
+        nodeId: nodeUnderView!.id,
         host: "",
         username: "",
         key: ""
@@ -47,7 +46,7 @@ export default function EditNodeModal({node, handleEditNode, submitting}: Props)
             trigger={<Button basic content='Edit' color='green'/>}
             style={{display: 'flex', width: '50%!'}}
         >
-            <Modal.Header>Edit {node.title}</Modal.Header>
+            <Modal.Header>Edit {nodeUnderView!.title}</Modal.Header>
             <Segment clearing style={{border: 'none'}}>
                 <Menu fluid={true} attached='top' tabular widths={4} style={{width: '50%!important'}}>
                     <Menu.Item name={generalMenu}
@@ -129,3 +128,4 @@ export default function EditNodeModal({node, handleEditNode, submitting}: Props)
         </Form>;
     }
 }
+export default observer(EditNodeModal)

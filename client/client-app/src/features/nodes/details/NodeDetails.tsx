@@ -1,17 +1,18 @@
 import React from "react";
-import {Button, Card, Icon} from "semantic-ui-react";
+import {Button, Card} from "semantic-ui-react";
 import {OtNode} from "../../../app/models/otnode";
 import EditNodeModal from "../edit/EditNodeModal";
-import {NodeGeneralDetails} from "../../../app/models/update-node-details";
+import {useStore} from "../../../app/stores/store";
+import {observer} from "mobx-react-lite";
 
 interface Props {
-    node: OtNode,
-    cancelViewNode: () => void;
-    handleEditNode: (details : NodeGeneralDetails)=> void;
-    submitting: boolean;
+    node: OtNode
 }
 
-export default function NodeDetails({node, cancelViewNode, handleEditNode, submitting}: Props) {
+function NodeDetails({node}: Props) {
+    const {nodeStore} = useStore();
+    const {cancelViewNode} = nodeStore;
+    
     return (
         <Card fluid>
             <Card.Content>
@@ -37,7 +38,7 @@ export default function NodeDetails({node, cancelViewNode, handleEditNode, submi
                     <br/>
                     <Button.Group widths='2'>
                         <Button basic onClick={cancelViewNode} content='Close' color='grey'/>
-                        <Button as={EditNodeModal} node={node} handleEditNode={handleEditNode} submitting={submitting}/>
+                        <Button as={EditNodeModal}/>
                     </Button.Group>
                 </Card.Content>
             </Card.Content>
@@ -66,3 +67,5 @@ export default function NodeDetails({node, cancelViewNode, handleEditNode, submi
             </>
     }
 }
+
+export default observer(NodeDetails);

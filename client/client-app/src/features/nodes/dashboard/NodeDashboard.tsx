@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React from "react";
 import {Button, Grid} from "semantic-ui-react";
 import {OtNode} from "../../../app/models/otnode";
 import NodeList from "./NodeList";
@@ -8,41 +8,26 @@ import NodeBulkActions from "./NodeBulkActions";
 import {NodeGeneralDetails} from "../../../app/models/update-node-details";
 import {CreateNodeRequest} from "../../../app/models/create-node";
 import {NodeRequest} from "../../../app/models/node-request";
+import BulkToggleButton from "./BulkToggleButton";
+import {useStore} from "../../../app/stores/store";
+import {observer} from "mobx-react-lite";
 
-interface Props {
-    nodes: OtNode[]
-    node: OtNode | undefined
-    selectedNodesForBulk : string[]
-    selectNode : (id: string) => void;
-    bulkToggle : () => void;
-    viewNode : (id: string) => void;
-    cancelViewNode : () => void;
-    handleEditNode: (details : NodeGeneralDetails) => void;
-    submitting : boolean;
-    handleCreateNode: (request: CreateNodeRequest) => void;
-    handleDeleteNode: (request: NodeRequest) => void;
-}
 
-export default function NodeDashboard({nodes, 
-                                          node, 
-                                          selectedNodesForBulk, 
-                                          bulkToggle, 
-                                          viewNode, 
-                                          cancelViewNode, 
-                                          selectNode, 
-                                          handleEditNode, 
-                                          handleCreateNode,
-                                          handleDeleteNode,
-                                          submitting}: Props) {
-        return (<Grid>
+function NodeDashboard() {
+    const {nodeStore} = useStore();
+    const {nodeUnderView} = nodeStore;
+
+    return (<Grid>
         <Grid.Column width='10'>
-            <CreateNodeModal handleCreateNode={handleCreateNode} submitting={submitting}/>
-            <NodeBulkActions selectedNodes={selectedNodesForBulk}/>
-            <Button onClick={()=>bulkToggle()} content='Select All' style={{backgroundColor: 'white', float:'right'}}/>
-            <NodeList nodes={nodes} selectNode={selectNode} viewNode={viewNode} selectedNodes={selectedNodesForBulk} handleDeleteNode={handleDeleteNode} submitting={submitting}/>
+            <CreateNodeModal/>
+            <NodeBulkActions/>
+            <BulkToggleButton/>
+            <NodeList/>
         </Grid.Column>
         <Grid.Column width='6'>
-            {node&&<NodeDetails node={node} cancelViewNode={cancelViewNode} handleEditNode={handleEditNode} submitting={submitting}/>}
+            {nodeUnderView && <NodeDetails node={nodeUnderView}/>}
         </Grid.Column>
     </Grid>)
 }
+
+export default observer(NodeDashboard)

@@ -1,19 +1,22 @@
-import React from "react";
+import React, {SyntheticEvent, useState} from "react";
 import {OtNode} from "../../../app/models/otnode";
-import {Button, Checkbox, Item, Segment} from "semantic-ui-react";
+import {Button, Item, Segment} from "semantic-ui-react";
 import NodeToggle from "./NodeToggle";
 import {NodeRequest} from "../../../app/models/node-request";
+import {useStore} from "../../../app/stores/store";
+import {observer} from "mobx-react-lite";
 
-interface Props {
-    nodes: OtNode[]
-    selectedNodes: string[]
-    selectNode : (id: string) => void;
-    viewNode : (id: string) => void
-    handleDeleteNode: (request: NodeRequest) => void;
-    submitting : boolean;
-}
-
-export default function NodeList({nodes, selectNode, viewNode, selectedNodes, handleDeleteNode, submitting}: Props) {
+function NodeList() {
+    const {nodeStore} = useStore();
+    const {nodes, viewNode, submitting, handleDeleteNode} = nodeStore;
+    const [target, setTarget] = useState('');
+    
+    function handleDelete(e: SyntheticEvent<HTMLButtonElement>, request: NodeRequest){
+        setTarget(e.currentTarget.name);
+        handleDeleteNode(request);
+    }
+    
+    // TODO: cleanup componentson this
     return (
         <Segment>
             <Item.Group divided>
@@ -23,17 +26,17 @@ export default function NodeList({nodes, selectNode, viewNode, selectedNodes, ha
                         <Item.Content>
                             <Item.Header as='a' style={{display: 'flex', justifyContent: 'space-between'}}>
                                 <div>{node.title}</div>
-                                <NodeToggle node={node} selectNode={selectNode} selectedNodes={selectedNodes}/>
+                                <NodeToggle node={node}/>
                             </Item.Header>
                             {getItemDescription(node)}
                             <Item.Extra>
                                 <Button floated='right' content='More' color='blue' onClick={()=>viewNode(node.id)}/>
-                                <Button floated='right' content='Delete' color='red' onClick={()=>{
+                                <Button name = {node.id} floated='right' content='Delete' color='red' onClick={(e)=>{
                                     var request : NodeRequest = {
                                         nodeId : node.id
                                     }
-                                    handleDeleteNode(request);
-                                }} disabled={submitting} loading={submitting}/>
+                                    handleDelete(e,request);
+                                }} disabled={submitting && target===node.id} loading={submitting && target===node.id}/>
                                 <div>Node details last updated {node.minutesSinceLastSnapshot === 0 || node.minutesSinceLastSnapshot === 1
                                     ? 'just now' 
                                     : node.minutesSinceLastSnapshot + ' minutes ago'}</div>
@@ -57,3 +60,5 @@ export default function NodeList({nodes, selectNode, viewNode, selectedNodes, ha
         </>;
     }
 }
+
+export default observer(NodeList)

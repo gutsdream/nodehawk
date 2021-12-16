@@ -1,17 +1,18 @@
-import {Button, Form, Header, Menu, Modal, Segment} from "semantic-ui-react";
+import {Button, Form, Header, Modal, Segment} from "semantic-ui-react";
 import React, {ChangeEvent, useState} from "react";
 import {CreateNodeRequest} from "../../../app/models/create-node";
+import {useStore} from "../../../app/stores/store";
+import {observer} from "mobx-react-lite";
 
-interface Props{
-    handleCreateNode: (request: CreateNodeRequest) => void;
-    submitting: boolean;
-}
-export default function CreateNodeModal({handleCreateNode, submitting} : Props ){
+// TODO: clean into comps
+function CreateNodeModal(){
+    const {nodeStore} = useStore();
+    const{handleCreateNode, submitting} = nodeStore;
     const [open, setOpen] = React.useState(false);
 
     const initialGeneralDetails : CreateNodeRequest = {
         title: "",
-        externalId: "",
+        externalId: undefined,
         host: "",
         username: "",
         key: ""
@@ -71,3 +72,5 @@ export default function CreateNodeModal({handleCreateNode, submitting} : Props )
         </Modal>
     )
 }
+
+export default observer(CreateNodeModal)

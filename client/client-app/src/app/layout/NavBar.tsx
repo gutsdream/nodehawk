@@ -1,7 +1,8 @@
-import React, {Fragment} from 'react';
+import React from 'react';
 import {Container, Menu} from "semantic-ui-react";
+import {observer} from "mobx-react-lite";
 
-export default function NavBar() {
+function NavBar() {
     return (
         <Container>
             <Menu inverted borderless fixed='top'>
@@ -23,3 +24,5 @@ export default function NavBar() {
         </Container>
     )
 }
+
+export default observer(NavBar)
