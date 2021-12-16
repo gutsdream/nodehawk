@@ -1,6 +1,5 @@
 import {Button, Form, Menu, Modal, Segment} from "semantic-ui-react";
 import React, {ChangeEvent, useState} from "react";
-import {OtNode} from "../../../app/models/otnode";
 import {NodeGeneralDetails} from "../../../app/models/update-node-details";
 import {NodeSshDetails} from "../../../app/models/update-node-ssh-details";
 import agent from "../../../app/api/agent";

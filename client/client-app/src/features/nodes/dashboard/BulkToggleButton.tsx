@@ -1,6 +1,5 @@
-import {Button, Checkbox} from "semantic-ui-react";
+import {Button} from "semantic-ui-react";
 import React from "react";
-import {OtNode} from "../../../app/models/otnode";
 import {useStore} from "../../../app/stores/store";
 import {observer} from "mobx-react-lite";
 

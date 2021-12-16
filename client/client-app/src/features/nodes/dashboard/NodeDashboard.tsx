@@ -1,17 +1,12 @@
 import React from "react";
-import {Button, Grid} from "semantic-ui-react";
-import {OtNode} from "../../../app/models/otnode";
+import {Grid} from "semantic-ui-react";
 import NodeList from "./NodeList";
 import NodeDetails from "../details/NodeDetails";
 import CreateNodeModal from "../create/CreateNodeModal";
 import NodeBulkActions from "./NodeBulkActions";
-import {NodeGeneralDetails} from "../../../app/models/update-node-details";
-import {CreateNodeRequest} from "../../../app/models/create-node";
-import {NodeRequest} from "../../../app/models/node-request";
 import BulkToggleButton from "./BulkToggleButton";
 import {useStore} from "../../../app/stores/store";
 import {observer} from "mobx-react-lite";
-
 
 function NodeDashboard() {
     const {nodeStore} = useStore();
