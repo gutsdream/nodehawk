@@ -85,5 +85,11 @@ namespace Infrastructure.Ssh
             Content = command.Result;
             Error = command.Error;
         }
+        
+        public SshCommandResult( string content, string error = null )
+        {
+            Content = content;
+            Error = error;
+        }
     }
 }

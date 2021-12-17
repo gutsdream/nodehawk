@@ -1,4 +1,5 @@
 using System;
+using Application.Core.JobManagement;
 using Application.Core.Persistence;
 using Domain.Entities;
 using Domain.ValueObjects;
@@ -21,7 +22,6 @@ namespace Testing.Shared
                 return new ConnectionDetails( "host".AsNonNull( ), "username".AsNonNull( ), "key".AsNonNull( ) ) { Id = Guid.NewGuid( ) };
             }
 
-            //TODO: move
             public static DataContext UniqueContext( )
             {
                 var dbContextOptions = new DbContextOptionsBuilder<DataContext>( )
@@ -29,6 +29,11 @@ namespace Testing.Shared
                     .Options;
 
                 return new DataContext( dbContextOptions );
+            }
+
+            public static TransientJobManagerFactory JobManagerFactory( DataContext context )
+            {
+                return new TransientJobManagerFactory( new InMemoryActiveJobTracker( ), context );
             }
         }
     }

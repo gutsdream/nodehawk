@@ -7,7 +7,7 @@ namespace Domain.Entities
     {
         public string Title { get; protected set; }
         public bool WasSuccessful { get; protected set; }
-        public JobType JobType { get; set; }
+        public JobType JobType { get; protected set; }
         
         public DateTime DateFinishedUtc { get; protected set; }
 

@@ -82,8 +82,8 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
         {
             activity.CheckingSpaceUsed( );
 
-            var dfCommandResult = nodeHawkSshClient.Run( new SshMessage("df .") );
-            var spaceUsed = dfCommandResult.Content
+            var dfCommandResult = nodeHawkSshClient.Run( new SshMessage( SshConstants.GetSpaceTakenOnDrive ) );
+            int spaceUsed = dfCommandResult.Content
                 .SplitToList( )
                 // Remove whitespace and line breaks
                 .Ignore( string.Empty, " ", "/\n" )
@@ -100,7 +100,7 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
         {
             activity.CheckingIfNodeOnline( );
 
-            var containerRunningResult = nodeHawkSshClient.Run( new SshMessage("docker container inspect -f '{{.State.Running}}' otnode") );
+            var containerRunningResult = nodeHawkSshClient.Run( new SshMessage( SshConstants.CheckIfContainerIsRunning ) );
             var containerRunning = containerRunningResult.Content.Contains( "true" );
             return containerRunning;
         }

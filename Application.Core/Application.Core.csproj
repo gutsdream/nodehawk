@@ -20,7 +20,6 @@
     <ItemGroup>
       <Folder Include="Features\Nodes\Commands" />
       <Folder Include="Features\Nodes\Queries" />
-      <Folder Include="Features\SshManagement" />
     </ItemGroup>
 
     <ItemGroup>

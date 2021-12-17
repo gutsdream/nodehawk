@@ -1,5 +1,7 @@
 using Application.Core.Interfaces;
+using Infrastructure.Ssh;
 using Moq;
+using Renci.SshNet;
 
 namespace Application.Testing.Mocks
 {
@@ -13,6 +15,11 @@ namespace Application.Testing.Mocks
         public void SshAuthenticationShouldFail( )
         {
             Setup( x => x.AreConnectionDetailsValid( It.IsAny<string>( ), It.IsAny<string>( ), It.IsAny<string>( ) ) ).Returns( false );
+        }
+
+        public void CommandShouldReturn( string command, string contentToReturn )
+        {
+            Setup( x => x.Run( It.Is<SshMessage>( y => y.Value == command ) ) ).Returns( new SshCommandResult( contentToReturn ) );
         }
     }
 }
