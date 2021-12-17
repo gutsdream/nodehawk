@@ -1,4 +1,4 @@
-using Domain.ExceptionHandling;
+using Domain.ValueObjects.Generics;
 
 namespace Domain.Entities
 {
@@ -14,15 +14,11 @@ namespace Domain.Entities
         {
         }
 
-        public ConnectionDetails( string host, string username, string key ) : this()
+        public ConnectionDetails( NonNull<string> host, NonNull<string> username, NonNull<string> key ) : this()
         {
-            Throw.If.Null( host, nameof( host ) );
-            Throw.If.Null( username, nameof( username ) );
-            Throw.If.Null( key, nameof( key ) );
-
-            Host = host;
-            Username = username;
-            Key = key;
+            Host = host.Value;
+            Username = username.Value;
+            Key = key.Value;
         }
     }
 }

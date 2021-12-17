@@ -1,4 +1,4 @@
-using Domain.ExceptionHandling;
+using Domain.ValueObjects;
 
 namespace Domain.Entities
 {
@@ -7,22 +7,25 @@ namespace Domain.Entities
         public string AccessKey { get; set; }
         public string SecretKey { get; set; }
 
-        public AwsDetails( string accessKey, string secretKey )
+        protected AwsDetails( )
+        {
+            
+        }
+        
+        public AwsDetails( NotNullOrWhitespace accessKey, NotNullOrWhitespace secretKey )
         {
             UpdateAccessKey( accessKey );
             UpdateSecretKey( secretKey );
         }
 
-        public void UpdateSecretKey( string secretKey )
+        public void UpdateAccessKey( NotNullOrWhitespace accessKey )
         {
-            Throw.If.NullOrWhitespace( secretKey, nameof( secretKey ) );
-            SecretKey = secretKey;
+            AccessKey = accessKey.Value;
         }
-
-        public void UpdateAccessKey( string accessKey )
+        
+        public void UpdateSecretKey( NotNullOrWhitespace secretKey )
         {
-            Throw.If.NullOrWhitespace( accessKey, nameof( accessKey ) );
-            AccessKey = accessKey;
+            SecretKey = secretKey.Value;
         }
     }
 }

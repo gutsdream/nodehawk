@@ -1,6 +1,8 @@
 using System;
 using Application.Core.Persistence;
 using Domain.Entities;
+using Domain.ValueObjects;
+using Domain.ValueObjects.Generics;
 using Microsoft.EntityFrameworkCore;
 
 namespace Testing.Shared
@@ -11,12 +13,12 @@ namespace Testing.Shared
         {
             public static Node Node( )
             {
-                return new Node( "title", ConnectionDetails( ) ) { Id = Guid.NewGuid( ) };
+                return new Node( "title".AsNonNull( ), ConnectionDetails( ).AsNonNull( ), new NodeExternalId( null ) ) { Id = Guid.NewGuid( ) };
             }
 
             public static ConnectionDetails ConnectionDetails( )
             {
-                return new ConnectionDetails( "host", "username", "key" ) { Id = Guid.NewGuid( ) };
+                return new ConnectionDetails( "host".AsNonNull( ), "username".AsNonNull( ), "key".AsNonNull( ) ) { Id = Guid.NewGuid( ) };
             }
 
             //TODO: move

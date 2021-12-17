@@ -7,6 +7,8 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using Application.Core.Shared;
+using Domain.ValueObjects;
+using Domain.ValueObjects.Generics;
 
 namespace Application.Core.Features.Aws.AwsDetails.Update
 {
@@ -47,10 +49,10 @@ namespace Application.Core.Features.Aws.AwsDetails.Update
             OnSuccessfulValidation( async x =>
             {
                 var details = await repository.AwsDetails.FirstAsync( );
-                
-                details.UpdateAccessKey( cypherService.Encrypt( x.AccessKey ) );
-                details.UpdateSecretKey( cypherService.Encrypt( x.SecretKey ) );
-                
+
+                details.UpdateAccessKey( new NotNullOrWhitespace( cypherService.Encrypt( x.AccessKey ) ) );
+                details.UpdateSecretKey( new NotNullOrWhitespace( cypherService.Encrypt( x.SecretKey ) ) );
+
                 repository.Add( details );
                 await repository.SaveChangesAsync( );
             } );

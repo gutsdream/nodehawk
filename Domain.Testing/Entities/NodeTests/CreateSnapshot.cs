@@ -1,5 +1,6 @@
 using System.Linq;
 using Domain.Entities;
+using Domain.ValueObjects;
 using Testing.Shared;
 using Xunit;
 
@@ -14,14 +15,14 @@ namespace Domain.Testing.Entities.NodeTests
             _node = TestData.Create.Node( );
         }
 
-        [Theory]
-        [InlineData( 0 )]
-        [InlineData( 50 )]
-        [InlineData( 100 )]
-        public void Should_CreateSnapshot_When_GivenValidParameters( int spaceUsed )
+        [Fact]
+        public void Should_CreateSnapshot( )
         {
+            // Given
+            var spaceUsed = 50;
+            
             // When
-            _node.CreateSnapshot( spaceUsed, true );
+            _node.CreateSnapshot( new Percentage( spaceUsed ), true );
 
             // Then
             Assert.Single( _node.Snapshots );
@@ -29,18 +30,6 @@ namespace Domain.Testing.Entities.NodeTests
             var snapshot = _node.Snapshots.First( );
             Assert.Equal( spaceUsed, snapshot.SpaceUsedPercentage );
             Assert.True( snapshot.ContainerRunning );
-        }
-
-        [Theory]
-        [InlineData( -1 )]
-        [InlineData( 101 )]
-        public void Should_ThrowException_WhenSpaceUsed_IsNotAPercentage( int spaceUsed )
-        {
-            // When
-            var exception = Record.Exception( ( ) => _node.CreateSnapshot( spaceUsed, true ) );
-
-            // Then
-            Assert.NotNull( exception );
         }
     }
 }

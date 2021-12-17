@@ -5,6 +5,8 @@ using Application.Core.Features.Nodes.Commands.Update.Details;
 using Domain.Entities;
 using Application.Core.Persistence;
 using Application.Testing.Mocks;
+using Domain.ValueObjects;
+using Domain.ValueObjects.Generics;
 using Testing.Shared;
 using Xunit;
 
@@ -243,7 +245,9 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
 
         private static Node UpdateNodeFromCommand( UpdateNodeDetails.Command command )
         {
-            return new Node( command.Title, new ConnectionDetails( "host", "user", "key" ), command.ExternalId );
+            return new Node( command.Title.AsNonNull( ),
+                new ConnectionDetails( "host".AsNonNull( ), "username".AsNonNull( ), "key".AsNonNull( ) ).AsNonNull( ),
+                new NodeExternalId( command.ExternalId ) );
         }
 
         private async Task<Guid> GivenIdOfNodeIdInRepository( )

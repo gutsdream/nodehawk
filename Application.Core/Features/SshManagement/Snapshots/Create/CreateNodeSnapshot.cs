@@ -6,6 +6,7 @@ using Application.Core.Extensions;
 using Application.Core.JobManagement;
 using Application.Core.Shared;
 using Domain.Entities;
+using Domain.ValueObjects;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
@@ -61,10 +62,10 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
 
                 ConnectToNode( nodeHawkSshClient, activity, node );
 
-                int spaceUsed = GetSpaceUsed( nodeHawkSshClient, activity );
+                int spaceUsed = GetSpaceUsedOnDrive( nodeHawkSshClient, activity );
                 bool containerRunning = IsContainerRunning( nodeHawkSshClient, activity );
 
-                node.CreateSnapshot( spaceUsed, containerRunning );
+                node.CreateSnapshot( new Percentage( spaceUsed ), containerRunning );
 
                 await repository.SaveChangesAsync( );
                 transientJobManager.MarkJobAsSuccess( activity );
@@ -77,7 +78,7 @@ namespace Application.Core.Features.SshManagement.Snapshots.Create
             nodeHawkSshClient.ConnectToNode( node );
         }
         
-        private static int GetSpaceUsed( INodeHawkSshClient nodeHawkSshClient, CreateNodeSnapshotJob activity )
+        private static int GetSpaceUsedOnDrive( INodeHawkSshClient nodeHawkSshClient, CreateNodeSnapshotJob activity )
         {
             activity.CheckingSpaceUsed( );
 

@@ -5,6 +5,7 @@ using Application.Core.Models.Requests;
 using Application.Core.Persistence;
 using Application.Core.Shared;
 using Domain.Entities;
+using Domain.ValueObjects.Generics;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
@@ -65,11 +66,11 @@ namespace Application.Core.Features.Nodes.Commands.Update.SshDetails
             {
                 var node = await repository.Nodes.FirstOrDefaultAsync( n => n.Id == x.NodeId );
 
-                var connectionDetails = new ConnectionDetails( cypherService.Encrypt( x.Host ),
-                    cypherService.Encrypt( x.Username ),
-                    cypherService.Encrypt( x.Key ) );
+                var connectionDetails = new ConnectionDetails( cypherService.Encrypt( x.Host ).AsNonNull( ),
+                    cypherService.Encrypt( x.Username ).AsNonNull( ),
+                    cypherService.Encrypt( x.Key ).AsNonNull( ) );
 
-                node.SetConnectionDetails( connectionDetails );
+                node.SetConnectionDetails( connectionDetails.AsNonNull() );
 
                 await repository.SaveChangesAsync( );
 

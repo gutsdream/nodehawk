@@ -4,6 +4,8 @@ using Application.Core.Features.Nodes.Commands.Create;
 using Application.Core.Persistence;
 using Application.Testing.Mocks;
 using Domain.Entities;
+using Domain.ValueObjects;
+using Domain.ValueObjects.Generics;
 using Microsoft.EntityFrameworkCore;
 using Testing.Shared;
 using Xunit;
@@ -14,7 +16,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
     {
         private CreateNodeHandler _createNodeHandler;
         private DataContext _context;
-        
+
         private readonly EventManagerMock _eventManagerMock;
         private readonly NodeHawkSshClientMock _sshClientMock;
 
@@ -29,7 +31,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         {
             // Given
             GivenFreshHandler( );
-            
+
             const string title = "Node One";
             var command = new CreateNode.Command
             {
@@ -56,7 +58,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         {
             // Given
             GivenFreshHandler( );
-            
+
             var command = new CreateNode.Command
             {
                 Title = title,
@@ -79,7 +81,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         {
             // Given
             GivenFreshHandler( );
-            
+
             var command = new CreateNode.Command
             {
                 Title = "Node One",
@@ -101,7 +103,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         {
             // Given
             GivenFreshHandler( );
-            
+
             var externalId = new string( 'a', 40 );
             var command = new CreateNode.Command
             {
@@ -127,7 +129,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         {
             // Given
             GivenFreshHandler( );
-            
+
             var externalId = new string( 'a', characterLength );
             var command = new CreateNode.Command
             {
@@ -155,7 +157,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         {
             // Given
             GivenFreshHandler( );
-            
+
             var command = new CreateNode.Command
             {
                 Title = "Node One",
@@ -180,7 +182,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         {
             // Given
             GivenFreshHandler( );
-            
+
             var command = new CreateNode.Command
             {
                 Title = "Node One",
@@ -205,7 +207,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         {
             // Given
             GivenFreshHandler( );
-            
+
             var command = new CreateNode.Command
             {
                 Title = "Node One",
@@ -228,7 +230,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         {
             // Given
             GivenFreshHandler( );
-            
+
             const string title = "Node One";
             var command = new CreateNode.Command
             {
@@ -255,7 +257,7 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
         {
             // Given
             GivenFreshHandler( );
-            
+
             const string externalId = "7cda80c35418f07543fae216cad224ea46dd11eb";
             var command = new CreateNode.Command
             {
@@ -278,14 +280,14 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
             Assert.False( result.IsSuccessful );
             Then.ResultContainsError( result, nameof( command.ExternalId ), $"Node with {nameof( Node.ExternalId )} '{externalId}' already exists." );
         }
-        
+
         [Fact]
         public async Task Should_ReturnFailure_When_SshAuthenticationFails( )
         {
             // Given
-            _sshClientMock.SshAuthenticationShouldFail();
+            _sshClientMock.SshAuthenticationShouldFail( );
             GivenFreshHandler( );
-            
+
             var command = new CreateNode.Command
             {
                 Title = "Node One",
@@ -300,14 +302,17 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
 
             // Then
             Assert.False( result.IsSuccessful );
-            Then.ResultContainsError( result, "SshDetails", "Could not verify authenticity of provided SSH connection details. Please ensure you have entered them correctly."  );
+            Then.ResultContainsError( result, "SshDetails",
+                "Could not verify authenticity of provided SSH connection details. Please ensure you have entered them correctly." );
         }
 
         private static Node CreateNodeFromCommand( CreateNode.Command command )
         {
-            return new Node( command.Title, new ConnectionDetails( command.Host, command.Username, command.Key ), command.ExternalId );
+            return new Node( command.Title.AsNonNull( ),
+                new ConnectionDetails( command.Host.AsNonNull( ), command.Username.AsNonNull( ), command.Key.AsNonNull( ) ).AsNonNull( ),
+                new NodeExternalId( command.ExternalId ) );
         }
-        
+
         private void GivenFreshHandler( )
         {
             _context = TestData.Create.UniqueContext( );
@@ -316,7 +321,6 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
                 new CypherServiceMock( ).Object,
                 _eventManagerMock.Object,
                 _sshClientMock.Object );
-            
         }
     }
 }

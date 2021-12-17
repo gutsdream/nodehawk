@@ -5,6 +5,8 @@ using Application.Core.Persistence;
 using FluentValidation;
 using FluentValidation.Results;
 using Application.Core.Shared;
+using Domain.ValueObjects;
+using Domain.ValueObjects.Generics;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Core.Features.Aws.AwsDetails.Register
@@ -47,7 +49,8 @@ namespace Application.Core.Features.Aws.AwsDetails.Register
 
             OnSuccessfulValidation( async x =>
             {
-                var details = new Domain.Entities.AwsDetails( cypherService.Encrypt( x.AccessKey ), cypherService.Encrypt( x.SecretKey ) );
+                var details = new Domain.Entities.AwsDetails( new NotNullOrWhitespace( cypherService.Encrypt( x.AccessKey ) ),
+                    new NotNullOrWhitespace( cypherService.Encrypt( x.SecretKey ) ) );
 
                 repository.Add( details );
                 await repository.SaveChangesAsync( );

@@ -49,13 +49,14 @@ namespace Application.Core.Shared
         /// <returns>An <see cref="ICommandResult"/> pertaining to the success or failure (with error keys) of the command.</returns>
         public async Task<ICommandResult> Handle( TCommand request, CancellationToken cancellationToken )
         {
+            // Request level validation (primitive value assertions)
             var requestValidationResult = request.Validate( );
             if ( !requestValidationResult.IsValid )
             {
                 return Failure( requestValidationResult );
             }
 
-            // Handler level validation
+            // Handler level validation (custom hook)
             if ( _validation != null )
             {
                 var handlerValidationResult = await _validation.Invoke( request );

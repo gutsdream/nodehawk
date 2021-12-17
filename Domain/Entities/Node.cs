@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Domain.Constants;
-using Domain.ExceptionHandling;
+using Domain.ValueObjects;
+using Domain.ValueObjects.Generics;
 
 namespace Domain.Entities
 {
@@ -33,37 +33,29 @@ namespace Domain.Entities
             Snapshots = new HashSet<Snapshot>( );
         }
 
-        public Node( string title, ConnectionDetails connectionDetails, string externalId = null ) : this()
+        public Node( NonNull<string> title, NonNull<ConnectionDetails> connectionDetails, NodeExternalId externalId ) : this()
         {
             SetTitle( title );
             SetConnectionDetails( connectionDetails );
             SetExternalId( externalId );
         }
 
-        public void SetTitle( string title )
+        public void SetTitle( NonNull<string> title )
         {
-            Throw.If.Null( title, nameof( title ) );
-            Title = title;
+            Title = title.Value;
         }
 
-        public void SetConnectionDetails( ConnectionDetails connectionDetails )
+        public void SetConnectionDetails( NonNull<ConnectionDetails> connectionDetails )
         {
-            Throw.If.Null( connectionDetails, nameof( connectionDetails ) );
-            ConnectionDetails = connectionDetails;
+            ConnectionDetails = connectionDetails.Value;
         }
 
-        public void SetExternalId( string externalId )
+        public void SetExternalId( NodeExternalId externalId )
         {
-            if ( externalId == null )
-            {
-                return;
-            }
-
-            Throw.If.InvalidLength( externalId, nameof( externalId ), NodeConstants.ExternalIdLength );
-            ExternalId = externalId;
+            ExternalId = externalId.Value;
         }
 
-        public void CreateSnapshot( int spaceUsedPercentage, bool containerRunning )
+        public void CreateSnapshot( Percentage spaceUsedPercentage, bool containerRunning )
         {
             var snapshot = new Snapshot( this, spaceUsedPercentage, containerRunning );
             Snapshots.Add( snapshot );
@@ -99,19 +91,16 @@ namespace Domain.Entities
                 CreatedDateUtc = DateTime.UtcNow;
             }
 
-            protected internal Snapshot( Node node, int spaceUsedPercentage, bool containerRunning ) : this()
+            protected internal Snapshot( Node node, Percentage spaceUsedPercentage, bool containerRunning ) : this()
             {
                 Node = node;
                 ContainerRunning = containerRunning;
-
                 SetSpaceUsed( spaceUsedPercentage );
             }
 
-            private void SetSpaceUsed( int spaceUsed )
+            private void SetSpaceUsed( Percentage spaceUsedPercentage )
             {
-                Throw.If.Null( spaceUsed, nameof( spaceUsed ) );
-                Throw.IfNot.Percentage( spaceUsed, nameof( spaceUsed ) );
-                SpaceUsedPercentage = spaceUsed;
+                SpaceUsedPercentage = spaceUsedPercentage.Value;
             }
         }
     }

@@ -4,6 +4,8 @@ using Application.Core.Models.Requests;
 using Application.Core.Persistence;
 using Application.Core.Shared;
 using Domain.Entities;
+using Domain.ValueObjects;
+using Domain.ValueObjects.Generics;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
@@ -41,8 +43,8 @@ namespace Application.Core.Features.Nodes.Commands.Create
 
     public class CreateNodeHandler : ValidatableCommandHandler<CreateNode.Command, CreateNode.Command.Validator>
     {
-        public CreateNodeHandler( DataContext repository, 
-            ICypherService cypherService, 
+        public CreateNodeHandler( DataContext repository,
+            ICypherService cypherService,
             IEventManager eventManager,
             INodeHawkSshClient sshClient )
         {
@@ -70,17 +72,15 @@ namespace Application.Core.Features.Nodes.Commands.Create
 
             OnSuccessfulValidation( async x =>
             {
-                var connectionDetails = new ConnectionDetails( cypherService.Encrypt( x.Host ),
-                    cypherService.Encrypt( x.Username ),
-                    cypherService.Encrypt( x.Key ) );
+                var connectionDetails = new ConnectionDetails( cypherService.Encrypt( x.Host ).AsNonNull( ),
+                    cypherService.Encrypt( x.Username ).AsNonNull( ),
+                    cypherService.Encrypt( x.Key ).AsNonNull( ) );
 
-                var node = new Node( x.Title, connectionDetails, x.ExternalId );
+                var node = new Node( x.Title.AsNonNull( ), connectionDetails.AsNonNull( ), new NodeExternalId( x.ExternalId ) );
                 repository.Add( node );
-                
-                //TODO: use a command post processor, remove Save from IRepository interface 
+
                 await repository.SaveChangesAsync( );
-                
-                // TODO: replace with agnostic event, remove coupling to snapshot slice
+
                 eventManager.PublishEvent( new NodeCreatedEvent( node.Id ) );
             } );
         }

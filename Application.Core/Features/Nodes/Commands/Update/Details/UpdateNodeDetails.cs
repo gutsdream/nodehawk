@@ -5,6 +5,8 @@ using Application.Core.Models.Requests;
 using Application.Core.Persistence;
 using Application.Core.Shared;
 using Domain.Entities;
+using Domain.ValueObjects;
+using Domain.ValueObjects.Generics;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
@@ -65,8 +67,8 @@ namespace Application.Core.Features.Nodes.Commands.Update.Details
                 {
                     var node = await repository.Nodes.FirstOrDefaultAsync( n => n.Id == x.NodeId );
 
-                    node.SetTitle( x.Title );
-                    node.SetExternalId( x.ExternalId );
+                    node.SetTitle( x.Title.AsNonNull( ) );
+                    node.SetExternalId( new NodeExternalId( x.ExternalId ) );
 
                     await repository.SaveChangesAsync( );
                 } );

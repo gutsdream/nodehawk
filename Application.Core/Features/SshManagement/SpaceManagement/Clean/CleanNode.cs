@@ -69,8 +69,8 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
                 CleanCacheAndJournals( sshClient, cleanNodeActivity );
 
                 node.AuditCleanup( );
-
                 await repository.SaveChangesAsync( );
+                
                 transientJobManager.MarkJobAsSuccess( cleanNodeActivity );
 
                 eventManager.PublishEvent( new NodeCleanedEvent( node.Id ) );

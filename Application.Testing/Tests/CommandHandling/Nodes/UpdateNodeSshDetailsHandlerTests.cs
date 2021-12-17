@@ -5,6 +5,8 @@ using Application.Core.Features.Nodes.Commands.Update.SshDetails;
 using Domain.Entities;
 using Application.Core.Persistence;
 using Application.Testing.Mocks;
+using Domain.ValueObjects;
+using Domain.ValueObjects.Generics;
 using Testing.Shared;
 using Xunit;
 
@@ -197,7 +199,9 @@ namespace Application.Testing.Tests.CommandHandling.Nodes
 
         private static Node UpdateNodeFromCommand( UpdateNodeSshDetails.Command command )
         {
-            return new Node( "placeholdertitle", new ConnectionDetails( command.Host, command.Username, command.Key ) );
+            return new Node( "title".AsNonNull( ),
+                new ConnectionDetails( command.Host.AsNonNull( ), command.Username.AsNonNull( ), command.Key.AsNonNull( ) ).AsNonNull( ),
+                new NodeExternalId( null ) );
         }
 
         private async Task<Guid> GivenIdOfNodeIdInRepository( )

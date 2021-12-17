@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Features.SshManagement.Snapshots.Clean;
 using Application.Core.Persistence;
+using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Testing.Shared;
 using Xunit;
@@ -23,7 +24,7 @@ namespace Application.Testing.Tests.CommandHandling.Snapshots
             GivenFreshHandler( );
 
             var node = TestData.Create.Node( );
-            node.CreateSnapshot( 50, true );
+            node.CreateSnapshot( new Percentage( 50 ), true );
             var snapshot = node.Snapshots.First( );
             _context.NodeSnapshots.Add( snapshot );
 
@@ -43,7 +44,7 @@ namespace Application.Testing.Tests.CommandHandling.Snapshots
             GivenFreshHandler( );
 
             var node = TestData.Create.Node( );
-            node.CreateSnapshot( 50, true );
+            node.CreateSnapshot( new Percentage( 50 ), true );
             var snapshot = node.Snapshots.First( );
             _context.NodeSnapshots.Add( snapshot );
             await _context.SaveChangesAsync( );

@@ -5,7 +5,7 @@ namespace Application.Core.Persistence
 {
     // For now this is being used directly by all the different application services
     // They're all relatively thin and self contained vertical slices so creating a !worthwhile! abstraction over this for now is unnecessary overhead IMO
-    // This dependency will be reversed at a later date if necessary, unlikely however
+    // This dependency will be inverted at a later date through an interface if necessary, this is unlikely however
     public class DataContext : DbContext
     {
         public DataContext( DbContextOptions options ) : base( options )
