@@ -18,8 +18,6 @@ namespace Scheduler
             recurringJobManager.AddOrUpdate( "Node Snapshot Cleanup: Daily",
                 ( ) => nodeHawkScheduledJobs.CleanOldSnapshots( ),
                 Cron.Daily );
-            
-            // TODO: allow user to automate their shit here (backup/ clean node weekly)
         }
     }
 }

@@ -1,26 +1,26 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{9949E8DB-3009-4708-9A8C-A491348D341F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Server\Api\Api.csproj", "{9949E8DB-3009-4708-9A8C-A491348D341F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{6119D9AB-D7BC-43FA-A01E-99EFA0A81C0D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Server\Domain\Domain.csproj", "{6119D9AB-D7BC-43FA-A01E-99EFA0A81C0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Core", "Application.Core\Application.Core.csproj", "{9B8C004D-B70E-4FC7-8281-7DD07A58D823}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Core", "Server\Application.Core\Application.Core.csproj", "{9B8C004D-B70E-4FC7-8281-7DD07A58D823}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{713DDE3F-E004-46E7-A95F-0D47E9FEC49E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Server\Infrastructure\Infrastructure.csproj", "{713DDE3F-E004-46E7-A95F-0D47E9FEC49E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{383431C3-24C3-49B9-A07F-A402091232EC}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Server\Testing", "{383431C3-24C3-49B9-A07F-A402091232EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Testing", "Application.Testing\Application.Testing.csproj", "{D486389C-542C-4A71-B141-33B59BD1ED68}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Testing", "Server\Application.Testing\Application.Testing.csproj", "{D486389C-542C-4A71-B141-33B59BD1ED68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Testing", "Domain.Testing\Domain.Testing.csproj", "{A03126FF-BDCF-4D75-B491-3A20126841A3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Testing", "Server\Domain.Testing\Domain.Testing.csproj", "{A03126FF-BDCF-4D75-B491-3A20126841A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scheduler", "Scheduler\Scheduler.csproj", "{52A85C49-BD88-49B0-8340-02A5CB55CF90}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scheduler", "Server\Scheduler\Scheduler.csproj", "{52A85C49-BD88-49B0-8340-02A5CB55CF90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing.Shared", "Testing.Shared\Testing.Shared.csproj", "{7E15BD5F-6AC0-4CBF-9602-34D31E48F94D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing.Shared", "Server\Testing.Shared\Testing.Shared.csproj", "{7E15BD5F-6AC0-4CBF-9602-34D31E48F94D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{1298CF82-3FD2-471F-82CA-CD6ED5DA141E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Server\Infrastructure", "{1298CF82-3FD2-471F-82CA-CD6ED5DA141E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{5C174A4C-FAEC-4040-B865-AF61D0EFC232}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Server\Core", "{5C174A4C-FAEC-4040-B865-AF61D0EFC232}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

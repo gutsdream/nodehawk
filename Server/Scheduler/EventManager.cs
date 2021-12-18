@@ -6,6 +6,7 @@ using MediatR;
 
 namespace Scheduler
 {
+    // TODO: move to Application
     public class EventManager : IEventManager
     {
         private readonly IBackgroundJobClient _backgroundJobClient;

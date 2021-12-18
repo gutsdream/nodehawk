@@ -6,7 +6,6 @@ using MediatR;
 
 namespace Scheduler.SnapshotScheduler
 {
-    //TODO: make this extend the recurring job manager maybe?
     public class NodeHawkScheduledJobs
     {
         private readonly IMediator _mediator;
