@@ -61,11 +61,8 @@ namespace Application.Core.Features.SshManagement.SpaceManagement.Clean
                 transientJobManager.RegisterActiveJob( cleanNodeActivity );
 
                 ConnectToNode( sshClient, cleanNodeActivity, node );
-
                 DeleteDockerOtNodeLogFile( sshClient, cleanNodeActivity );
-
                 DeleteDockerTextLogs( sshClient, cleanNodeActivity );
-
                 CleanCacheAndJournals( sshClient, cleanNodeActivity );
 
                 node.AuditCleanup( );
