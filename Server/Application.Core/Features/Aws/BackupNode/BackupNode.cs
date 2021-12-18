@@ -126,9 +126,12 @@ namespace Application.Core.Features.Aws.BackupNode
             sshClient.ConnectToNode( node );
 
             nodeJobBackup.RunningBackupScript( );
-            sshClient.Run( BackupScriptSshCommand( cypherService.Decrypt( awsDetails.AccessKey ),
+            
+            var backupScriptCommand = BackupScriptSshCommand( cypherService.Decrypt( awsDetails.AccessKey ),
                 cypherService.Decrypt( awsDetails.SecretKey ),
-                GetBucketNameForNode( node ) ) );
+                GetBucketNameForNode( node ) );
+            
+            sshClient.Run( backupScriptCommand );
         }
 
         private static SshMessage BackupScriptSshCommand( string accessKey, string secretKey, string bucketName )
