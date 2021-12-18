@@ -1,15 +1,12 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Application.Core.Features.SshManagement;
-using Application.Core.Features.SshManagement.Snapshots.Clean;
 using Application.Core.Features.SshManagement.Snapshots.Create;
 using Application.Core.Persistence;
 using Application.Testing.Mocks;
 using Domain.Entities;
 using Domain.Interfaces;
-using Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Testing.Shared;
 using Xunit;

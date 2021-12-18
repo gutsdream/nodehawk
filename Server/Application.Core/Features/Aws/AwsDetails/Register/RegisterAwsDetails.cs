@@ -6,7 +6,6 @@ using FluentValidation;
 using FluentValidation.Results;
 using Application.Core.Shared;
 using Domain.ValueObjects;
-using Domain.ValueObjects.Generics;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Core.Features.Aws.AwsDetails.Register

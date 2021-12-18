@@ -1,6 +1,5 @@
 using Domain.Entities;
 using Domain.ValueObjects;
-using Domain.ValueObjects.Generics;
 using Xunit;
 
 namespace Domain.Testing.Entities.AwsDetailsTests

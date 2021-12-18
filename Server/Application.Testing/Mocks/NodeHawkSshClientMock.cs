@@ -1,7 +1,6 @@
 using Application.Core.Interfaces;
 using Infrastructure.Ssh;
 using Moq;
-using Renci.SshNet;
 
 namespace Application.Testing.Mocks
 {

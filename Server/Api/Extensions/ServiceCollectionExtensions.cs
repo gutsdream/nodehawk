@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Application.Core.Persistence;
-using Newtonsoft.Json;
+using Microsoft.AspNetCore.DataProtection;
 using Scheduler;
 using Scheduler.SnapshotScheduler;
 
@@ -22,7 +22,8 @@ namespace Api.Extensions
         {
             services.AddDbContext<DataContext>( opt => { opt.UseSqlite( configuration.GetConnectionString( "DefaultConnection" ) ); } );
 
-            services.AddDataProtection( );
+            services.AddDataProtection( )
+                .SetApplicationName( "nodehawk" );
 
             services.AddSingleton<ICypherService, CypherService>( );
             services.AddScoped<INodeHawkSshClient, NodeHawkSshClient>( );
@@ -33,10 +34,6 @@ namespace Api.Extensions
                 x.UseMemoryStorage( );
             } );
             services.AddHangfireServer( );
-            
-            var settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All };
-
-            // GlobalConfiguration.Configuration.UseSerializerSettings( new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All } );
             
             services.AddScoped<NodeHawkScheduledJobs, NodeHawkScheduledJobs>( );
             services.AddScoped<IEventManager, EventManager>( );

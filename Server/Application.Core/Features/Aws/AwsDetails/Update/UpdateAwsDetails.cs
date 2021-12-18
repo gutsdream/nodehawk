@@ -8,7 +8,6 @@ using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 using Application.Core.Shared;
 using Domain.ValueObjects;
-using Domain.ValueObjects.Generics;
 
 namespace Application.Core.Features.Aws.AwsDetails.Update
 {
