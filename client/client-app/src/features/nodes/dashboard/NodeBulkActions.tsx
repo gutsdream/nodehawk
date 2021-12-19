@@ -9,15 +9,14 @@ function NodeBulkActions() {
     const {selectedNodesForBulk} = nodeStore;
 
     return (
-        <Button color='black'>
-            <Dropdown item text='Bulk Actions'>
-                <Dropdown.Menu>
-                    <Dropdown.Item>Refresh</Dropdown.Item>
-                    <Dropdown.Item>Clean</Dropdown.Item>
-                    <Dropdown.Item>Backup</Dropdown.Item>
-                </Dropdown.Menu>
-            </Dropdown>
-        </Button>
+        <Dropdown color='white' disabled={selectedNodesForBulk.length === 0} button text='Bulk Actions' style={{backgroundColor: 'black', color: 'white'}}>
+            <Dropdown.Menu>
+                <Dropdown.Item>Refresh</Dropdown.Item>
+                <Dropdown.Item>Clean</Dropdown.Item>
+                <Dropdown.Item>Backup</Dropdown.Item>
+            </Dropdown.Menu>
+        </Dropdown>
     )
 }
+
 export default observer(NodeBulkActions)
