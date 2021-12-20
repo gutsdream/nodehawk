@@ -6,7 +6,6 @@ using MediatR;
 
 namespace Scheduler
 {
-    // TODO: move to Application
     public class EventManager : IEventManager
     {
         private readonly IBackgroundJobClient _backgroundJobClient;
@@ -21,8 +20,6 @@ namespace Scheduler
         public void PublishEvent<TEvent>( TEvent applicationEvent ) where TEvent : IApplicationEvent
         {
             _backgroundJobClient.Enqueue( ( ) => Publish( applicationEvent ) );
-            // Background firing of task
-            // Task.Run( ( ) => Publish( applicationEvent ) );
         }
 
         // Must be public for HangFire to consume it
