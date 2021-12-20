@@ -29,7 +29,7 @@ namespace Application.Core.Features.Aws.AwsDetails.Update
         }
     }
 
-    public class UpdateAwsDetailsHandler : ValidatableCommandHandler<RegisterAwsDetails.Command, RegisterAwsDetails.Command.Validator>
+    public class UpdateAwsDetailsHandler : ValidatableCommandHandler<UpdateAwsDetails.Command, UpdateAwsDetails.Command.Validator>
     {
         public UpdateAwsDetailsHandler( DataContext repository, ICypherService cypherService )
         {
@@ -52,7 +52,6 @@ namespace Application.Core.Features.Aws.AwsDetails.Update
                 details.UpdateAccessKey( new NotNullOrWhitespace( cypherService.Encrypt( x.AccessKey ) ) );
                 details.UpdateSecretKey( new NotNullOrWhitespace( cypherService.Encrypt( x.SecretKey ) ) );
 
-                repository.Add( details );
                 await repository.SaveChangesAsync( );
             } );
         }

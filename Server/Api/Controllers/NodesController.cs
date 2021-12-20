@@ -64,9 +64,27 @@ namespace Api.Controllers
         }
         
         [HttpPost]
+        public async Task<IActionResult> BulkCreateSnapshot( BulkCreateNodeSnapshot.Command createNodeSnapshotCommand )
+        {
+            await Mediator.Send( createNodeSnapshotCommand );
+
+            // Returning OK 200 response as it's not worth concatenating errors for a bulk command IMO, job history displays it
+            return Ok( );
+        }
+        
+        [HttpPost]
         public async Task<IActionResult> CleanNode( CleanNode.Command cleanNodeCommand )
         {
             return Evaluate( await Mediator.Send( cleanNodeCommand ) );
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> BulkCleanNode( BulkCleanNode.Command cleanNodeCommand )
+        {
+            await Mediator.Send( cleanNodeCommand );
+
+            // Returning OK 200 response as it's not worth concatenating errors for a bulk command IMO, job history displays it
+            return Ok( );
         }
     }
 }

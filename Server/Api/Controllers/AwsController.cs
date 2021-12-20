@@ -30,5 +30,14 @@ namespace Api.Controllers
         {
             return Evaluate( await Mediator.Send( updateAwsDetails ) );
         }
+        
+        [HttpPost]
+        public async Task<IActionResult> BulkBackupNode( BulkBackupNode.Command updateAwsDetails )
+        {
+            await Mediator.Send( updateAwsDetails );
+
+            // Returning OK 200 response as it's not worth concatenating errors for a bulk command IMO, job history displays it
+            return Ok( );
+        }
     }
 }
